@@ -1,6 +1,7 @@
 package com.tridevmc.molecule;
 
 
+import com.tridevmc.compound.config.CompoundConfig;
 import com.tridevmc.compound.gui.CompoundGui;
 import com.tridevmc.compound.gui.CompoundTestGui;
 import com.tridevmc.compound.gui.widget.WidgetTest;
@@ -47,6 +48,8 @@ public final class Molecule {
 
         FMLJavaModLoadingContext loadingContext = FMLJavaModLoadingContext.get();
         loadingContext.getModEventBus().addListener(this::onSetup);
+
+        CompoundConfig.of(MoleculeConfig.class, "molecule");
     }
 
     private void onSetup(FMLCommonSetupEvent e) {
