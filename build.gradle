@@ -8,6 +8,9 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+
+evaluationDependsOn(':Compound')
+
 apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -26,14 +29,14 @@ minecraft {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
             mods {
                 molecule {
-                    source sourceSets.main
+                    sources sourceSets.main, project(':Compound').sourceSets.main
                 }
             }
         }
@@ -42,14 +45,14 @@ minecraft {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
             mods {
                 molecule {
-                    source sourceSets.main
+                    sources sourceSets.main, project(':Compound').sourceSets.main
                 }
             }
         }
@@ -61,7 +64,7 @@ configurations {
 }
 
 dependencies {
-    compile project(':Compound')
+    compileOnly project(':Compound')
 
     minecraft 'net.minecraftforge:forge:1.13.2-25.0.36'
 }
