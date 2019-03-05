@@ -6,17 +6,16 @@ import com.tridevmc.compound.gui.CompoundGui;
 import com.tridevmc.compound.gui.CompoundTestGui;
 import com.tridevmc.compound.gui.widget.WidgetTest;
 import com.tridevmc.compound.network.core.CompoundNetwork;
+import com.tridevmc.molecule.init.MLBlocks;
 import com.tridevmc.molecule.network.ClientTestMessage;
 import com.tridevmc.molecule.network.ServerTestMessage;
 import com.tridevmc.molecule.proxy.ClientProxy;
 import com.tridevmc.molecule.proxy.CommonProxy;
-import com.tridevmc.molecule.init.MLBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -54,7 +53,7 @@ public final class Molecule {
 
     private void onSetup(FMLCommonSetupEvent e) {
         PROXY.setup();
-        CompoundNetwork.createNetwork(new ResourceLocation(MOD_ID, "network"), "1");
+        CompoundNetwork.createNetwork("molecule", "1");
 
         gui = new CompoundTestGui();
         gui.getGrid().registerWidget(new WidgetTest(), 0, 0);

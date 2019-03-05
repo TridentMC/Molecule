@@ -2,7 +2,6 @@ package com.tridevmc.molecule.network;
 
 import com.tridevmc.compound.network.message.Message;
 import com.tridevmc.molecule.Molecule;
-import java.util.Random;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -10,6 +9,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Random;
 
 public class TestMessage extends Message {
 
@@ -60,20 +61,20 @@ public class TestMessage extends Message {
     @Override
     public String toString() {
         return new ToStringBuilder(this, new MultilineRecursiveToStringStyle())
-            .append("myFloat", myFloat)
-            .append("myDouble", myDouble)
-            .append("myByte", myByte)
-            .append("myShort", myShort)
-            .append("myInt", myInt)
-            .append("myLong", myLong)
-            .append("myBoolean", myBoolean)
-            .append("myOtherBoolean", myOtherBoolean)
-            .append("myChar", myChar)
-            .append("myString", myString)
-            .append("myItemStack", myItemStack.getItem() + ":" + myItemStack.getTag())
-            .append("myTag", myTag)
-            .append("myPos", myPos)
-            .toString();
+                .append("myFloat", myFloat)
+                .append("myDouble", myDouble)
+                .append("myByte", myByte)
+                .append("myShort", myShort)
+                .append("myInt", myInt)
+                .append("myLong", myLong)
+                .append("myBoolean", myBoolean)
+                .append("myOtherBoolean", myOtherBoolean)
+                .append("myChar", myChar)
+                .append("myString", myString)
+                .append("myItemStack", myItemStack.getItem() + ":" + myItemStack.getTag())
+                .append("myTag", myTag)
+                .append("myPos", myPos)
+                .toString();
     }
 
     @Override
