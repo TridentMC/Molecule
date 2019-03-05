@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -30,6 +31,8 @@ public class TestMessage extends Message {
     public NBTTagCompound myTag;
     public BlockPos myPos;
 
+    public EnumFacing myFacing;
+
     public TestMessage() {
         this(false);
     }
@@ -50,9 +53,10 @@ public class TestMessage extends Message {
 
             this.myItemStack = Items.TRIDENT.getDefaultInstance();
             this.myTag = new NBTTagCompound();
-            this.myTag.setFloat("Float", 4F);
+            this.myTag.putFloat("Float", 4F);
             Random rand = new Random();
             this.myPos = new BlockPos(rand.nextInt(511), rand.nextInt(255), rand.nextInt(511));
+            this.myFacing = EnumFacing.random(rand);
 
             Molecule.LOG.info("Sending {}, {}", this.getClass().getName(), this.toString());
         }
@@ -74,6 +78,7 @@ public class TestMessage extends Message {
                 .append("myItemStack", myItemStack.getItem() + ":" + myItemStack.getTag())
                 .append("myTag", myTag)
                 .append("myPos", myPos)
+                .append("myFacing", myFacing.getName())
                 .toString();
     }
 
