@@ -1,7 +1,10 @@
-package com.tridevmc.molecule;
+package com.tridevmc.molecule.config;
 
+import com.google.common.collect.Lists;
 import com.tridevmc.compound.config.ConfigType;
 import com.tridevmc.compound.config.ConfigValue;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.ArrayList;
@@ -23,6 +26,9 @@ public class MoleculeConfig {
     @ConfigValue(comment = "Test String")
     public String testString = "Thirty-Two";
 
+    @ConfigValue(comment = "Test Block")
+    public Block testBlock = Blocks.STONE;
+
     @ConfigValue(comment = "Test Integer Array")
     public int[] testIntArray = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
@@ -34,6 +40,9 @@ public class MoleculeConfig {
 
     @ConfigValue(comment = "Test String Array")
     public String[] testStringArray = new String[]{"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"};
+
+    @ConfigValue(comment = "Test Block Array")
+    public Block[] testBlockArray = new Block[]{Blocks.DIRT, Blocks.STONE, Blocks.OAK_PLANKS};
 
     @ConfigValue(comment = "Test Integer List")
     public List<Integer> testIntList = new ArrayList<>(Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}));
@@ -47,5 +56,7 @@ public class MoleculeConfig {
     @ConfigValue(comment = "Test String List")
     public List<String> testStringList = new ArrayList<>(Arrays.asList(new String[]{"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"}));
 
+    @ConfigValue(comment = "Test Block List")
+    public List<Block> testBlockList = Lists.newArrayList(Blocks.DIRT, Blocks.STONE, Blocks.OAK_PLANKS);
 
 }

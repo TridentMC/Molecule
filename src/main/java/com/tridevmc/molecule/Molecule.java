@@ -6,6 +6,7 @@ import com.tridevmc.compound.gui.CompoundGui;
 import com.tridevmc.compound.gui.CompoundTestGui;
 import com.tridevmc.compound.gui.widget.WidgetTest;
 import com.tridevmc.compound.network.core.CompoundNetwork;
+import com.tridevmc.molecule.config.MoleculeConfig;
 import com.tridevmc.molecule.init.MLBlocks;
 import com.tridevmc.molecule.network.ClientTestMessage;
 import com.tridevmc.molecule.network.ServerTestMessage;
@@ -40,6 +41,7 @@ public final class Molecule {
     public static CommonProxy PROXY;
     public static MoleculeItemGroup CREATIVE_TAB = new MoleculeItemGroup(Molecule.NAME);
     public static Molecule INSTANCE;
+    public static MoleculeConfig CONFIG;
 
     public Molecule() {
         INSTANCE = this;
@@ -48,7 +50,7 @@ public final class Molecule {
         FMLJavaModLoadingContext loadingContext = FMLJavaModLoadingContext.get();
         loadingContext.getModEventBus().addListener(this::onSetup);
 
-        CompoundConfig.of(MoleculeConfig.class, "molecule");
+        CONFIG = CompoundConfig.of(MoleculeConfig.class, "molecule");
     }
 
     private void onSetup(FMLCommonSetupEvent e) {
