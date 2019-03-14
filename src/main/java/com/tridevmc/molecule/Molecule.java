@@ -24,6 +24,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -50,12 +51,12 @@ public final class Molecule {
         FMLJavaModLoadingContext loadingContext = FMLJavaModLoadingContext.get();
         loadingContext.getModEventBus().addListener(this::onSetup);
 
-        CONFIG = CompoundConfig.of(MoleculeConfig.class, "molecule");
+        CONFIG = CompoundConfig.of(MoleculeConfig.class, ModLoadingContext.get().getActiveContainer());
     }
 
     private void onSetup(FMLCommonSetupEvent e) {
         PROXY.setup();
-        CompoundNetwork.createNetwork("molecule", "molecule");
+        CompoundNetwork.createNetwork(ModLoadingContext.get().getActiveContainer(), "molecule");
 
         gui = new CompoundTestGui();
         gui.getGrid().registerWidget(new WidgetTest(), 0, 0);
