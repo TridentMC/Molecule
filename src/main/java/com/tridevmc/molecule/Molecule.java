@@ -55,7 +55,7 @@ public final class Molecule {
 
     private void onSetup(FMLCommonSetupEvent e) {
         PROXY.setup();
-        CompoundNetwork.createNetwork("molecule", "1");
+        CompoundNetwork.createNetwork("molecule", "main");
 
         gui = new CompoundTestGui();
         gui.getGrid().registerWidget(new WidgetTest(), 0, 0);
