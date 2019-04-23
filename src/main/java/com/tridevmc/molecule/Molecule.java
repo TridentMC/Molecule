@@ -2,9 +2,6 @@ package com.tridevmc.molecule;
 
 
 import com.tridevmc.compound.config.CompoundConfig;
-import com.tridevmc.compound.gui.CompoundGui;
-import com.tridevmc.compound.gui.CompoundTestGui;
-import com.tridevmc.compound.gui.widget.WidgetTest;
 import com.tridevmc.compound.network.core.CompoundNetwork;
 import com.tridevmc.molecule.config.MoleculeConfig;
 import com.tridevmc.molecule.init.MLBlocks;
@@ -12,7 +9,9 @@ import com.tridevmc.molecule.network.ClientTestMessage;
 import com.tridevmc.molecule.network.ServerTestMessage;
 import com.tridevmc.molecule.proxy.ClientProxy;
 import com.tridevmc.molecule.proxy.CommonProxy;
+import com.tridevmc.molecule.ui.MoleculeUI;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -57,14 +56,10 @@ public final class Molecule {
     private void onSetup(FMLCommonSetupEvent e) {
         PROXY.setup();
         CompoundNetwork.createNetwork(ModLoadingContext.get().getActiveContainer(), "molecule");
-
-        gui = new CompoundTestGui();
-        gui.getGrid().registerWidget(new WidgetTest(), 0, 0);
-
         MinecraftForge.EVENT_BUS.register(Molecule.class);
     }
 
-    static CompoundGui gui;
+    static MoleculeUI ui;
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
@@ -83,7 +78,12 @@ public final class Molecule {
 
     @SubscribeEvent
     public static void renderEvent(RenderGameOverlayEvent.Text event) {
-        gui.drawScreen(0, 0);
+        if (ui == null)
+            ui = new MoleculeUI();
+        Minecraft mc = Minecraft.getInstance();
+        int x = (int) (mc.mouseHelper.getMouseX() * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
+        int y = (int) (mc.mouseHelper.getMouseY() * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
+        ui.render(x, y, mc.getTickLength());
     }
 
     @SubscribeEvent
