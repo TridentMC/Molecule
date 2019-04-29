@@ -2,8 +2,8 @@ package com.tridevmc.molecule.ui;
 
 import com.tridevmc.compound.ui.CompoundUI;
 import com.tridevmc.compound.ui.Rect2D;
-import com.tridevmc.compound.ui.element.ElementBox;
 import com.tridevmc.compound.ui.element.ElementContainerGrid;
+import com.tridevmc.compound.ui.element.ElementSlot;
 import com.tridevmc.compound.ui.layout.LayoutCentered;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -15,9 +15,9 @@ public class MoleculeUI extends CompoundUI {
     public void initElements() {
         ElementContainerGrid grid = new ElementContainerGrid(new Rect2D(0, 0, this.width, this.height), true, 1, 1);
         grid.setLayout(new LayoutCentered(true, true));
-        for (int i = 0; i < 10; i++) {
-            grid.addElement(new ElementBox(new Rect2D(0, 0, 10 + i, 10 + i)));
-        }
+        //for (int i = 0; i < 5; i++) {
+        //    grid.addElement(new ElementSlot(new Rect2D(0, 0, 18, 18)));
+        //}
         this.addElement(grid);
         // Have to use this because we don't actually register a gui with Forge.
         // In a real implementation we would add a listener to the UI itself.
