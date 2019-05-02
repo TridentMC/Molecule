@@ -3,7 +3,6 @@ package com.tridevmc.molecule.ui;
 import com.tridevmc.compound.ui.CompoundUI;
 import com.tridevmc.compound.ui.Rect2D;
 import com.tridevmc.compound.ui.element.ElementContainerGrid;
-import com.tridevmc.compound.ui.element.ElementSlot;
 import com.tridevmc.compound.ui.layout.LayoutCentered;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;

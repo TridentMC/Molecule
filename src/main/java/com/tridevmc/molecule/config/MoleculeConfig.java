@@ -45,16 +45,16 @@ public class MoleculeConfig {
     public Block[] testBlockArray = new Block[]{Blocks.DIRT, Blocks.STONE, Blocks.OAK_PLANKS};
 
     @ConfigValue(comment = "Test Integer List")
-    public List<Integer> testIntList = new ArrayList<>(Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}));
+    public List<Integer> testIntList = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 
     @ConfigValue(comment = "Test Double List")
-    public List<Double> testDoubleList = new ArrayList<>(Arrays.asList(new Double[]{0.01D, 0.02D, 0.03D, 0.04D, 0.05D, 0.06D, 0.07D, 0.08D, 0.09D, 0.1D}));
+    public List<Double> testDoubleList = new ArrayList<>(Arrays.asList(0.01D, 0.02D, 0.03D, 0.04D, 0.05D, 0.06D, 0.07D, 0.08D, 0.09D, 0.1D));
 
     @ConfigValue(comment = "Test Boolean List")
-    public List<Boolean> testBooleanList = new ArrayList<>(Arrays.asList(new Boolean[]{true, false, true, false}));
+    public List<Boolean> testBooleanList = new ArrayList<>(Arrays.asList(true, false, true, false));
 
     @ConfigValue(comment = "Test String List")
-    public List<String> testStringList = new ArrayList<>(Arrays.asList(new String[]{"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"}));
+    public List<String> testStringList = new ArrayList<>(Arrays.asList("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"));
 
     @ConfigValue(comment = "Test Block List")
     public List<Block> testBlockList = Lists.newArrayList(Blocks.DIRT, Blocks.STONE, Blocks.OAK_PLANKS);
