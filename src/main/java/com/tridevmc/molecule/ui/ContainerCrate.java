@@ -20,20 +20,20 @@ public class ContainerCrate extends CompoundContainer {
         // Actual inventory
         for (int k = 0; k < 3; ++k) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new SlotItemHandler(this.inventory, l + k * 9, 8 + l * 18, 18 + k * 18));
+                this.addSlot(new SlotItemHandler(this.inventory, l + k * 9, this.inventorySlots.size(), 0));
             }
         }
 
         // Player inventory
         for (int i1 = 0; i1 < 3; ++i1) {
             for (int k1 = 0; k1 < 9; ++k1) {
-                this.addSlot(new Slot(playerInv, k1 + i1 * 9 + 9, 8 + k1 * 18, 84 + i1 * 18));
+                this.addSlot(new Slot(playerInv, k1 + i1 * 9 + 9, this.inventorySlots.size(), 0));
             }
         }
 
         // Hotbar
         for (int j1 = 0; j1 < 9; ++j1) {
-            this.addSlot(new Slot(playerInv, j1, 8 + j1 * 18, 142));
+            this.addSlot(new Slot(playerInv, j1, this.inventorySlots.size(), 0));
         }
     }
 
