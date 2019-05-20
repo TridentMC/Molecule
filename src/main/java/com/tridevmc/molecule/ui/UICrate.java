@@ -4,6 +4,7 @@ import com.tridevmc.compound.ui.Rect2D;
 import com.tridevmc.compound.ui.container.CompoundContainer;
 import com.tridevmc.compound.ui.container.CompoundUIContainer;
 import com.tridevmc.compound.ui.element.ElementBox;
+import com.tridevmc.compound.ui.element.ElementLabel;
 import com.tridevmc.compound.ui.element.button.ElementButton;
 import com.tridevmc.compound.ui.layout.*;
 
@@ -34,6 +35,10 @@ public class UICrate extends CompoundUIContainer {
                 hotbarGrid.registerElement(this.addSlotElement(hotbarLayout, i));
             }
         }
+
+        ElementLabel label = new ElementLabel(new Rect2D(0, 1, 16, 16), new LayoutMarquee(), this.fontRenderer);
+        label.setText("WELCOME TO MY SUPER COOL UI");
+        this.addElement(label);
 
         ElementButton button = new ElementButton(new Rect2D(0, 0, 50, 50), new LayoutRelative(bg));
         this.addElement(button);
