@@ -1,8 +1,9 @@
 package com.tridevmc.molecule;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 public class MoleculeItemGroup extends ItemGroup {
 
@@ -12,6 +13,6 @@ public class MoleculeItemGroup extends ItemGroup {
 
     @Override
     public ItemStack createIcon() {
-        return new ItemStack(Blocks.BARRIER, 1);
+        return new ItemStack(Items.TRIDENT, 1);
     }
 }

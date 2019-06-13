@@ -7,9 +7,11 @@ import com.tridevmc.compound.ui.element.ElementBox;
 import com.tridevmc.compound.ui.element.ElementLabel;
 import com.tridevmc.compound.ui.element.button.ElementButton;
 import com.tridevmc.compound.ui.layout.*;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.util.text.ITextComponent;
 
-public class UICrate extends CompoundUIContainer {
-    public UICrate(CompoundContainer container) {
+public class UICrate extends CompoundUIContainer<ContainerCrate> {
+    public UICrate(ContainerCrate container, PlayerInventory playerInventory, ITextComponent name) {
         super(container);
     }
 
@@ -26,7 +28,7 @@ public class UICrate extends CompoundUIContainer {
         LayoutGrid hotbarGrid = new LayoutGrid(new Rect2D(8, 134, 19 * 9, 18));
         ILayout hotbarLayout = new LayoutMulti(hotbarGrid, new LayoutRelative(bg));
 
-        for (int i = 0; i < this.inventorySlots.inventorySlots.size(); i++) {
+        for (int i = 0; i < this.getContainer().inventorySlots.size(); i++) {
             if (i < 27) {
                 crateGrid.registerElement(this.addSlotElement(crateLayout, i));
             } else if (i < 54) {
@@ -36,7 +38,7 @@ public class UICrate extends CompoundUIContainer {
             }
         }
 
-        ElementLabel label = new ElementLabel(new Rect2D(0, 1, 16, 16), new LayoutMarquee(), this.fontRenderer);
+        ElementLabel label = new ElementLabel(new Rect2D(0, 1, 16, 16), new LayoutMarquee(), this.font);
         label.setText("WELCOME TO MY SUPER COOL UI");
         this.addElement(label);
 

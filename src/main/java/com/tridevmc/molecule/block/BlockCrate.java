@@ -1,26 +1,26 @@
 package com.tridevmc.molecule.block;
 
 import com.tridevmc.molecule.ui.ContainerCrate;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class BlockCrate extends BlockContainer {
+public class BlockCrate extends ContainerBlock {
     public BlockCrate(Properties builder) {
         super(builder);
         new TileCrate();
@@ -34,38 +34,22 @@ public class BlockCrate extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (!worldIn.isRemote && player instanceof EntityPlayerMP && worldIn.getTileEntity(pos) instanceof TileCrate) {
-            NetworkHooks.openGui((EntityPlayerMP) player, new IInteractionObject() {
-                @Override
-                public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
-                    return new ContainerCrate(playerInventory, (TileCrate) worldIn.getTileEntity(pos));
-                }
-
-                @Override
-                public String getGuiID() {
-                    return "molecule:crate";
-                }
-
-                @Override
-                public ITextComponent getName() {
-                    return new TextComponentString("");
-                }
-
-                @Override
-                public boolean hasCustomName() {
-                    return false;
-                }
-
+    public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+        if (!world.isRemote && player instanceof ServerPlayerEntity && world.getTileEntity(pos) instanceof TileCrate) {
+            NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
                 @Nullable
                 @Override
-                public ITextComponent getCustomName() {
-                    return new TextComponentString("");
+                public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity player) {
+                    return new ContainerCrate(id, playerInventory, world.getTileEntity(pos));
+                }
+
+                @Override
+                public ITextComponent getDisplayName() {
+                    return new StringTextComponent("");
                 }
             }, pos);
         }
 
         return true;
-
     }
 }

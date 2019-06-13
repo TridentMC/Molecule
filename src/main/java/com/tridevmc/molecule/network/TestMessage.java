@@ -2,11 +2,11 @@ package com.tridevmc.molecule.network;
 
 import com.tridevmc.compound.network.message.Message;
 import com.tridevmc.molecule.Molecule;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,10 +28,10 @@ public class TestMessage extends Message {
     public String myString;
 
     public ItemStack myItemStack;
-    public NBTTagCompound myTag;
+    public CompoundNBT myTag;
     public BlockPos myPos;
 
-    public EnumFacing myFacing;
+    public Direction myFacing;
 
     public TestMessage() {
         this(false);
@@ -52,11 +52,11 @@ public class TestMessage extends Message {
             this.myString = "haha YES";
 
             this.myItemStack = Items.TRIDENT.getDefaultInstance();
-            this.myTag = new NBTTagCompound();
+            this.myTag = new CompoundNBT();
             this.myTag.putFloat("Float", 4F);
             Random rand = new Random();
             this.myPos = new BlockPos(rand.nextInt(511), rand.nextInt(255), rand.nextInt(511));
-            this.myFacing = EnumFacing.random(rand);
+            this.myFacing = Direction.random(rand);
 
             Molecule.LOG.info("Sending {}, {}", this.getClass().getName(), this.toString());
         }
@@ -83,7 +83,7 @@ public class TestMessage extends Message {
     }
 
     @Override
-    public void handle(EntityPlayer player) {
+    public void handle(PlayerEntity player) {
         Molecule.LOG.info("Received {}, {}", this.getClass().getName(), this.toString());
     }
 }

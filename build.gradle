@@ -9,20 +9,22 @@ buildscript {
     }
 }
 
+apply from: "properties.gradle"
+
 evaluationDependsOn(':Compound')
 
 apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 
-version = '0'
-group = 'com.tridevmc'
-archivesBaseName = 'molecule'
+version = modVersion
+group = modGroup
+archivesBaseName = modBaseName
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190412-1.13.2'
+    mappings channel: 'snapshot', version: mappingsVersion
 
     runs {
         client {
@@ -66,7 +68,7 @@ configurations {
 dependencies {
     compileOnly project(':Compound')
 
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.128'
+    minecraft "net.minecraftforge:forge:${forgeVersion}"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

@@ -2,10 +2,13 @@ package com.tridevmc.molecule.ui;
 
 import com.tridevmc.compound.ui.container.CompoundContainer;
 import com.tridevmc.molecule.block.TileCrate;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
+import com.tridevmc.molecule.init.MoleculeContent;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -13,8 +16,9 @@ public class ContainerCrate extends CompoundContainer {
     private final TileCrate crate;
     private final IItemHandler inventory;
 
-    public ContainerCrate(InventoryPlayer playerInv, TileCrate crate) {
-        this.crate = crate;
+    public ContainerCrate(int window, PlayerInventory playerInv, TileEntity tile) {
+        super(MoleculeContent.CRATE_CONTAINER, window);
+        this.crate = tile instanceof TileCrate ? (TileCrate) tile : null;
         this.inventory = crate.inventory;
 
         // Actual inventory
@@ -37,8 +41,12 @@ public class ContainerCrate extends CompoundContainer {
         }
     }
 
+    public ContainerCrate(int window, PlayerInventory playerInventory, PacketBuffer data) {
+        this(window, playerInventory, playerInventory.player.world.getTileEntity(data.readBlockPos()));
+    }
+
     @Override
-    public boolean canInteractWith(EntityPlayer player) {
+    public boolean canInteractWith(PlayerEntity player) {
         if (this.crate.getWorld().getTileEntity(this.crate.getPos()) != this.crate) {
             return false;
         } else {
@@ -48,7 +56,7 @@ public class ContainerCrate extends CompoundContainer {
         }
     }
 
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
         ItemStack out = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
         if (slot != null && slot.getHasStack()) {

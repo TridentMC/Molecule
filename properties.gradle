@@ -1,0 +1,10 @@
+ext {
+    // Mod Stuff
+    modGroup = "com.tridevmc"
+    modVersion = "0"
+    modBaseName = "molecule"
+
+    // Forge Stuff
+    forgeVersion = "1.14.2-26.0.23"
+    mappingsVersion = "20190612-1.14.2"
+}
