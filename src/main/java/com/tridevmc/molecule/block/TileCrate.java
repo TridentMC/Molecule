@@ -1,6 +1,7 @@
 package com.tridevmc.molecule.block;
 
 import com.tridevmc.molecule.init.MoleculeContent;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -24,8 +25,8 @@ public class TileCrate extends TileEntity {
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void read(BlockState state, CompoundNBT compound) {
+        super.read(state, compound);
         this.inventory.deserializeNBT(compound.getCompound("inv"));
     }
 

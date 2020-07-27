@@ -1,6 +1,5 @@
 package com.tridevmc.molecule;
 
-
 import com.tridevmc.compound.config.CompoundConfig;
 import com.tridevmc.compound.network.core.CompoundNetwork;
 import com.tridevmc.molecule.config.MoleculeConfig;
