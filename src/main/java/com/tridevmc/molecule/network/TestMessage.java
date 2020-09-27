@@ -56,7 +56,7 @@ public class TestMessage extends Message {
             this.myTag.putFloat("Float", 4F);
             Random rand = new Random();
             this.myPos = new BlockPos(rand.nextInt(511), rand.nextInt(255), rand.nextInt(511));
-            this.myFacing = Direction.func_239631_a_(rand); // TODO: Mappings are cool, the method name is just 'random'
+            this.myFacing = Direction.getRandomDirection(rand);
 
             Molecule.LOG.info("Sending {}, {}", this.getClass().getName(), this.toString());
         }
