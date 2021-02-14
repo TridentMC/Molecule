@@ -9,7 +9,8 @@ buildscript {
     }
 }
 
-apply from: "properties.gradle"
+apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
+modBaseName = "molecule"
 
 evaluationDependsOn(':Compound')
 
