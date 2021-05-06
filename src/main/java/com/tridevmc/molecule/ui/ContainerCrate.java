@@ -46,7 +46,7 @@ public class ContainerCrate extends CompoundContainer {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         if (this.crate.getWorld().getTileEntity(this.crate.getPos()) != this.crate) {
             return false;
         } else {
