@@ -30,18 +30,18 @@ public class BlockCrate extends ContainerBlock {
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public TileEntity newBlockEntity(IBlockReader world) {
         return new TileCrate();
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if (!world.isRemote && player instanceof ServerPlayerEntity && world.getTileEntity(pos) instanceof TileCrate) {
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+        if (!world.isClientSide && player instanceof ServerPlayerEntity && world.getBlockEntity(pos) instanceof TileCrate) {
             NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
                 @Nullable
                 @Override
-                public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity player) {
-                    return new ContainerCrate(id, playerInventory, world.getTileEntity(pos));
+                public Container createMenu(int id, PlayerInventory inventory, PlayerEntity player) {
+                    return new ContainerCrate(id, inventory, world.getBlockEntity(pos));
                 }
 
                 @Override

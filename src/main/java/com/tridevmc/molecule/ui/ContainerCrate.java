@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerCrate extends CompoundContainer {
     private final TileCrate crate;
@@ -24,60 +23,60 @@ public class ContainerCrate extends CompoundContainer {
         // Actual inventory
         for (int k = 0; k < 3; ++k) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new SlotItemHandler(this.inventory, l + k * 9, this.inventorySlots.size(), 0));
+                this.addSlotFor(this.inventory, l + k * 9);
             }
         }
 
         // Player inventory
         for (int i1 = 0; i1 < 3; ++i1) {
             for (int k1 = 0; k1 < 9; ++k1) {
-                this.addSlot(new Slot(playerInv, k1 + i1 * 9 + 9, this.inventorySlots.size(), 0));
+                this.addSlotFor(playerInv, k1 + i1 * 9 + 9);
             }
         }
 
         // Hotbar
         for (int j1 = 0; j1 < 9; ++j1) {
-            this.addSlot(new Slot(playerInv, j1, this.inventorySlots.size(), 0));
+            this.addSlotFor(playerInv, j1);
         }
     }
 
     public ContainerCrate(int window, PlayerInventory playerInventory, PacketBuffer data) {
-        this(window, playerInventory, playerInventory.player.world.getTileEntity(data.readBlockPos()));
+        this(window, playerInventory, playerInventory.player.level.getBlockEntity(data.readBlockPos()));
     }
 
     @Override
     public boolean stillValid(PlayerEntity player) {
-        if (this.crate.getWorld().getTileEntity(this.crate.getPos()) != this.crate) {
+        if (this.crate.getLevel().getBlockEntity(this.crate.getBlockPos()) != this.crate) {
             return false;
         } else {
-            return player.getDistanceSq((double) this.crate.getPos().getX() + 0.5D,
-                    (double) this.crate.getPos().getY() + 0.5D,
-                    (double) this.crate.getPos().getZ() + 0.5D) <= 64D;
+            return player.distanceToSqr((double) this.crate.getBlockPos().getX() + 0.5D,
+                    (double) this.crate.getBlockPos().getY() + 0.5D,
+                    (double) this.crate.getBlockPos().getZ() + 0.5D) <= 64D;
         }
     }
 
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    @Override
+    public ItemStack quickMoveStack(PlayerEntity player, int index) {
         ItemStack out = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
-        if (slot != null && slot.getHasStack()) {
-            ItemStack stackSlot = slot.getStack();
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack stackSlot = slot.getItem();
             out = stackSlot.copy();
             if (index < this.inventory.getSlots()) {
-                if (!this.mergeItemStack(stackSlot, this.inventory.getSlots(), this.inventorySlots.size(), true)) {
+                if (!this.moveItemStackTo(stackSlot, this.inventory.getSlots(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(stackSlot, 0, this.inventory.getSlots(), false)) {
+            } else if (!this.moveItemStackTo(stackSlot, 0, this.inventory.getSlots(), false)) {
                 return ItemStack.EMPTY;
             }
 
             if (stackSlot.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
 
         return out;
     }
-
 }

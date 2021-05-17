@@ -3,8 +3,8 @@ package com.tridevmc.molecule.network;
 import com.tridevmc.compound.network.message.Message;
 import com.tridevmc.molecule.Molecule;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +56,7 @@ public class TestMessage extends Message {
             this.myTag.putFloat("Float", 4F);
             Random rand = new Random();
             this.myPos = new BlockPos(rand.nextInt(511), rand.nextInt(255), rand.nextInt(511));
-            this.myFacing = Direction.getRandomDirection(rand);
+            this.myFacing = Direction.getRandom(rand);
 
             Molecule.LOG.info("Sending {}, {}", this.getClass().getName(), this.toString());
         }

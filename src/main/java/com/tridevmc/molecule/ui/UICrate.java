@@ -26,7 +26,7 @@ public class UICrate extends CompoundUIContainer<ContainerCrate> {
         LayoutGrid hotbarGrid = new LayoutGrid(new Rect2F(8, 134, 18 * 9, 18));
         ILayout hotbarLayout = new LayoutMulti(hotbarGrid, new LayoutRelative(bg));
 
-        for (int i = 0; i < this.getContainer().inventorySlots.size(); i++) {
+        for (int i = 0; i < this.getMenu().slots.size(); i++) {
             if (i < 27) {
                 crateGrid.registerElement(this.addSlotElement(crateLayout, i));
             } else if (i < 54) {
@@ -37,7 +37,7 @@ public class UICrate extends CompoundUIContainer<ContainerCrate> {
         }
 
         ElementLabel label = new ElementLabel(new Rect2F(0, 1, 16, 16), new LayoutMarquee(), this.font);
-        label.setText("Hey.");
+        label.setText("you're a bottom");
         this.addElement(label);
 
         //ElementButton button = new ElementButton(new Rect2D(0, 0, 50, 50), new LayoutRelative(bg));

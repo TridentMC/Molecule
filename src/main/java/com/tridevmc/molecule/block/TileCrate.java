@@ -4,14 +4,11 @@ import com.tridevmc.molecule.init.MoleculeContent;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,15 +22,15 @@ public class TileCrate extends TileEntity {
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundNBT compound) {
+        super.load(state, compound);
         this.inventory.deserializeNBT(compound.getCompound("inv"));
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         compound.put("inv", this.inventory.serializeNBT());
-        return super.write(compound);
+        return super.save(compound);
     }
 
     @Nonnull

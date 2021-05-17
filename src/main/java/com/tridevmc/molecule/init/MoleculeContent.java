@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 
 public class MoleculeContent {
 
-    public static BlockCrate CRATE = new BlockCrate(Block.Properties.create(Material.WOOD));
+    public static BlockCrate CRATE = new BlockCrate(Block.Properties.of(Material.WOOD));
     public static TileEntityType<TileCrate> CRATE_TILE;
     public static ContainerType<ContainerCrate> CRATE_CONTAINER;
 
@@ -73,7 +73,7 @@ public class MoleculeContent {
     }
 
     public static void registerScreens() {
-        ScreenManager.registerFactory(CRATE_CONTAINER, UICrate::new);
+        ScreenManager.register(CRATE_CONTAINER, UICrate::new);
     }
 
     public static void registerTiles(IForgeRegistry<TileEntityType<?>> registry) {
@@ -89,15 +89,15 @@ public class MoleculeContent {
     private static <T extends TileEntity> TileEntityType<T> registerTile(IForgeRegistry<TileEntityType<?>> registry, ResourceLocation name, Supplier<T> tileSupplier) {
         Type<?> fixer = null;
         try {
-            fixer = DataFixesManager.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getVersion().getWorldVersion())).getChoiceType(TypeReferences.BLOCK_ENTITY, name.toString());
+            fixer = DataFixesManager.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().getWorldVersion())).getChoiceType(TypeReferences.BLOCK_ENTITY, name.toString());
         } catch (IllegalArgumentException e) {
-            if (SharedConstants.developmentMode) {
+            if (SharedConstants.IS_RUNNING_IN_IDE) {
                 throw e;
             }
 
             Molecule.LOG.warn("No data fixer registered for tile {}", name.toString());
         }
-        TileEntityType<T> type = TileEntityType.Builder.create(tileSupplier).build(fixer);
+        TileEntityType<T> type = TileEntityType.Builder.of(tileSupplier).build(fixer);
         registry.register(type.setRegistryName(name));
         return type;
     }
