@@ -36,8 +36,8 @@ public class UICrate extends CompoundUIContainer<ContainerCrate> {
             }
         }
 
-        ElementLabel label = new ElementLabel(new Rect2F(0, 1, 16, 16), new LayoutMarquee(), this.font);
-        label.setText("you're a bottom");
+        ElementLabel label = new ElementLabel(new Rect2F(0, 1, 16, 16), new LayoutMarquee(2F, 2F), this.font);
+        label.setText("Title t");
         this.addElement(label);
 
         //ElementButton button = new ElementButton(new Rect2D(0, 0, 50, 50), new LayoutRelative(bg));
