@@ -3,13 +3,13 @@ package com.tridevmc.molecule.ui;
 import com.tridevmc.compound.ui.Rect2F;
 import com.tridevmc.compound.ui.container.CompoundUIContainer;
 import com.tridevmc.compound.ui.element.ElementBox;
-import com.tridevmc.compound.ui.element.ElementLabel;
+import com.tridevmc.compound.ui.element.button.ElementButton;
 import com.tridevmc.compound.ui.layout.*;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
-public class UICrate extends CompoundUIContainer<ContainerCrate> {
-    public UICrate(ContainerCrate container, PlayerInventory playerInventory, ITextComponent name) {
+public class UICrate extends CompoundUIContainer<CrateMenu> {
+    public UICrate(CrateMenu container, Inventory inventory, Component name) {
         super(container);
     }
 
@@ -26,7 +26,7 @@ public class UICrate extends CompoundUIContainer<ContainerCrate> {
         LayoutGrid hotbarGrid = new LayoutGrid(new Rect2F(8, 134, 18 * 9, 18));
         ILayout hotbarLayout = new LayoutMulti(hotbarGrid, new LayoutRelative(bg));
 
-        for (int i = 0; i < this.getContainer().inventorySlots.size(); i++) {
+        for (int i = 0; i < this.getMenu().slots.size(); i++) {
             if (i < 27) {
                 crateGrid.registerElement(this.addSlotElement(crateLayout, i));
             } else if (i < 54) {
@@ -36,11 +36,11 @@ public class UICrate extends CompoundUIContainer<ContainerCrate> {
             }
         }
 
-        ElementLabel label = new ElementLabel(new Rect2F(0, 1, 16, 16), new LayoutMarquee(), this.font);
-        label.setText("Hey.");
-        this.addElement(label);
+        //ElementLabel label = new ElementLabel(new Rect2F(0, 1, 16, 16), new LayoutMarquee(), this.font);
+        //label.setText("Hey.");
+        //this.addElement(label);
 
-        //ElementButton button = new ElementButton(new Rect2D(0, 0, 50, 50), new LayoutRelative(bg));
-        //this.addElement(button);
+        ElementButton button = new ElementButton(new Rect2F(0, 0, 50, 50), new LayoutRelative(bg));
+        this.addElement(button);
     }
 }

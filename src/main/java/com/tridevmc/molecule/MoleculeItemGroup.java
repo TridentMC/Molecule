@@ -1,11 +1,10 @@
 package com.tridevmc.molecule;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
-public class MoleculeItemGroup extends ItemGroup {
+public class MoleculeItemGroup extends CreativeModeTab {
 
     public MoleculeItemGroup(String name) {
         super(name);

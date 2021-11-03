@@ -2,12 +2,12 @@ package com.tridevmc.molecule.network;
 
 import com.tridevmc.compound.network.message.Message;
 import com.tridevmc.molecule.Molecule;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -28,7 +28,7 @@ public class TestMessage extends Message {
     public String myString;
 
     public ItemStack myItemStack;
-    public CompoundNBT myTag;
+    public CompoundTag myTag;
     public BlockPos myPos;
 
     public Direction myFacing;
@@ -52,11 +52,11 @@ public class TestMessage extends Message {
             this.myString = "haha YES";
 
             this.myItemStack = Items.TRIDENT.getDefaultInstance();
-            this.myTag = new CompoundNBT();
+            this.myTag = new CompoundTag();
             this.myTag.putFloat("Float", 4F);
             Random rand = new Random();
             this.myPos = new BlockPos(rand.nextInt(511), rand.nextInt(255), rand.nextInt(511));
-            this.myFacing = Direction.getRandomDirection(rand);
+            this.myFacing = Direction.getRandom(rand);
 
             Molecule.LOG.info("Sending {}, {}", this.getClass().getName(), this.toString());
         }
@@ -83,7 +83,7 @@ public class TestMessage extends Message {
     }
 
     @Override
-    public void handle(PlayerEntity player) {
+    public void handle(Player player) {
         Molecule.LOG.info("Received {}, {}", this.getClass().getName(), this.toString());
     }
 }

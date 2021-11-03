@@ -3,8 +3,8 @@ package com.tridevmc.molecule.config;
 import com.google.common.collect.Lists;
 import com.tridevmc.compound.config.ConfigType;
 import com.tridevmc.compound.config.ConfigValue;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.ArrayList;

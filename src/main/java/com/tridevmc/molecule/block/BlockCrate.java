@@ -1,56 +1,55 @@
 package com.tridevmc.molecule.block;
 
-import com.tridevmc.molecule.ui.ContainerCrate;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import com.tridevmc.molecule.ui.CrateMenu;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class BlockCrate extends ContainerBlock {
+public class BlockCrate extends BaseEntityBlock {
     public BlockCrate(Properties builder) {
         super(builder);
-        new TileCrate();
         this.setRegistryName("molecule:crate");
     }
 
-    @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new TileCrate();
-    }
-
-    @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if (!world.isRemote && player instanceof ServerPlayerEntity && world.getTileEntity(pos) instanceof TileCrate) {
-            NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof CrateBlockEntity) {
+            NetworkHooks.openGui((ServerPlayer) player, new MenuProvider() {
                 @Nullable
                 @Override
-                public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity player) {
-                    return new ContainerCrate(id, playerInventory, world.getTileEntity(pos));
+                public AbstractContainerMenu createMenu(int id, Inventory playerInv, Player player) {
+                    return new CrateMenu(id, playerInv, level.getBlockEntity(pos));
                 }
 
                 @Override
-                public ITextComponent getDisplayName() {
-                    return new StringTextComponent("");
+                public Component getDisplayName() {
+                    return new TextComponent("");
                 }
             }, pos);
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
+    }
+
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new CrateBlockEntity(pos, state);
     }
 }

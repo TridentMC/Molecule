@@ -1,39 +1,38 @@
 package com.tridevmc.molecule.init;
 
+import com.mojang.blaze3d.platform.ScreenManager;
 import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.types.Type;
 import com.tridevmc.molecule.Molecule;
 import com.tridevmc.molecule.block.BlockCrate;
-import com.tridevmc.molecule.block.TileCrate;
-import com.tridevmc.molecule.ui.ContainerCrate;
+import com.tridevmc.molecule.block.CrateBlockEntity;
+import com.tridevmc.molecule.ui.CrateMenu;
 import com.tridevmc.molecule.ui.UICrate;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedConstants;
-import net.minecraft.util.datafix.DataFixesManager;
-import net.minecraft.util.datafix.TypeReferences;
+import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.IContainerFactory;
+import net.minecraftforge.fmllegacy.network.IContainerFactory;
 import net.minecraftforge.registries.IForgeRegistry;
-
-import java.util.function.Supplier;
 
 public class MoleculeContent {
 
-    public static BlockCrate CRATE = new BlockCrate(Block.Properties.create(Material.WOOD));
-    public static TileEntityType<TileCrate> CRATE_TILE;
-    public static ContainerType<ContainerCrate> CRATE_CONTAINER;
+    public static BlockCrate CRATE = new BlockCrate(Block.Properties.of(Material.WOOD));
+    public static BlockEntityType<CrateBlockEntity> CRATE_TILE;
+    public static MenuType<CrateMenu> CRATE_MENU;
 
     @SubscribeEvent
     public static void onBlockRegister(final RegistryEvent.Register<Block> e) {
@@ -46,13 +45,13 @@ public class MoleculeContent {
     }
 
     @SubscribeEvent
-    public static void onTileRegister(final RegistryEvent.Register<TileEntityType<?>> e) {
+    public static void onBlockEntityRegister(final RegistryEvent.Register<BlockEntityType<?>> e) {
         registerTiles(e.getRegistry());
     }
 
     @SubscribeEvent
-    public static void onContainerRegister(final RegistryEvent.Register<ContainerType<?>> e) {
-        registerContainers(e.getRegistry());
+    public static void onMenuRegister(final RegistryEvent.Register<MenuType<?>> e) {
+        registerMenus(e.getRegistry());
     }
 
     public static void registerBlocks(IForgeRegistry<Block> registry) {
@@ -65,39 +64,39 @@ public class MoleculeContent {
         registry.register(itemBlock);
     }
 
-    public static void registerContainers(IForgeRegistry<ContainerType<?>> registry) {
-        CRATE_CONTAINER = IForgeContainerType.create(ContainerCrate::new);
-        registry.register(CRATE_CONTAINER.setRegistryName("molecule", "crate"));
+    public static void registerMenus(IForgeRegistry<MenuType<?>> registry) {
+        CRATE_MENU = IForgeContainerType.create(CrateMenu::new);
+        registry.register(CRATE_MENU.setRegistryName("molecule", "crate"));
 
         DistExecutor.runWhenOn(Dist.CLIENT, () -> MoleculeContent::registerScreens);
     }
 
     public static void registerScreens() {
-        ScreenManager.registerFactory(CRATE_CONTAINER, UICrate::new);
+        MenuScreens.register(CRATE_MENU, UICrate::new);
     }
 
-    public static void registerTiles(IForgeRegistry<TileEntityType<?>> registry) {
-        CRATE_TILE = registerTile(registry, new ResourceLocation("molecule", "crate"), TileCrate::new);
+    public static void registerTiles(IForgeRegistry<BlockEntityType<?>> registry) {
+        CRATE_TILE = registerTile(registry, new ResourceLocation("molecule", "crate"), CrateBlockEntity::new);
     }
 
-    private static ContainerType<?> registerContainer(IForgeRegistry<ContainerType<?>> registry, ResourceLocation name, IContainerFactory<?> containerFactory) {
-        ContainerType<?> containerType = IForgeContainerType.create(containerFactory);
+    private static MenuType<?> registerContainer(IForgeRegistry<MenuType<?>> registry, ResourceLocation name, IContainerFactory<?> containerFactory) {
+        MenuType<?> containerType = IForgeContainerType.create(containerFactory);
         registry.register(containerType.setRegistryName(name));
         return containerType;
     }
 
-    private static <T extends TileEntity> TileEntityType<T> registerTile(IForgeRegistry<TileEntityType<?>> registry, ResourceLocation name, Supplier<T> tileSupplier) {
+    private static <T extends BlockEntity> BlockEntityType<T> registerTile(IForgeRegistry<BlockEntityType<?>> registry, ResourceLocation name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier) {
         Type<?> fixer = null;
         try {
-            fixer = DataFixesManager.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getVersion().getWorldVersion())).getChoiceType(TypeReferences.BLOCK_ENTITY, name.toString());
+            fixer = DataFixers.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().getWorldVersion())).getChoiceType(References.BLOCK_ENTITY, name.toString());
         } catch (IllegalArgumentException e) {
-            if (SharedConstants.developmentMode) {
+            if (SharedConstants.IS_RUNNING_IN_IDE) {
                 throw e;
             }
 
             Molecule.LOG.warn("No data fixer registered for tile {}", name.toString());
         }
-        TileEntityType<T> type = TileEntityType.Builder.create(tileSupplier).build(fixer);
+        BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntitySupplier).build(fixer);
         registry.register(type.setRegistryName(name));
         return type;
     }
