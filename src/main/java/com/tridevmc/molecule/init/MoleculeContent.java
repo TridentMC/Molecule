@@ -1,13 +1,12 @@
 package com.tridevmc.molecule.init;
 
-import com.mojang.blaze3d.platform.ScreenManager;
 import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.types.Type;
 import com.tridevmc.molecule.Molecule;
 import com.tridevmc.molecule.block.BlockCrate;
 import com.tridevmc.molecule.block.CrateBlockEntity;
 import com.tridevmc.molecule.ui.CrateMenu;
-import com.tridevmc.molecule.ui.UICrate;
+import com.tridevmc.molecule.ui.CrateUI;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.ResourceLocation;
@@ -72,7 +71,7 @@ public class MoleculeContent {
     }
 
     public static void registerScreens() {
-        MenuScreens.register(CRATE_MENU, UICrate::new);
+        MenuScreens.register(CRATE_MENU, CrateUI::new);
     }
 
     public static void registerTiles(IForgeRegistry<BlockEntityType<?>> registry) {

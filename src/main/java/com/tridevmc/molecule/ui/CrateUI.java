@@ -8,8 +8,8 @@ import com.tridevmc.compound.ui.layout.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class UICrate extends CompoundUIContainer<CrateMenu> {
-    public UICrate(CrateMenu container, Inventory inventory, Component name) {
+public class CrateUI extends CompoundUIContainer<CrateMenu> {
+    public CrateUI(CrateMenu container, Inventory inventory, Component name) {
         super(container);
     }
 
@@ -36,11 +36,7 @@ public class UICrate extends CompoundUIContainer<CrateMenu> {
             }
         }
 
-        //ElementLabel label = new ElementLabel(new Rect2F(0, 1, 16, 16), new LayoutMarquee(), this.font);
-        //label.setText("Hey.");
-        //this.addElement(label);
-
-        ElementButton button = new ElementButton(new Rect2F(0, 0, 50, 50), new LayoutRelative(bg));
+        ElementButton button = new ElementButton(new Rect2F(-50, 50, 50, 50), new LayoutRelative(bg));
         this.addElement(button);
     }
 }
