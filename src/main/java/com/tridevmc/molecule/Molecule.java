@@ -10,7 +10,6 @@ import com.tridevmc.molecule.proxy.ClientProxy;
 import com.tridevmc.molecule.proxy.CommonProxy;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -48,7 +47,7 @@ public final class Molecule {
 
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent e) {
-        Player player = e.getPlayer();
+        var player = e.getEntity();
         if (player instanceof ServerPlayer) {
             new ServerTestMessage(true).sendTo((ServerPlayer) player);
         } else if (player instanceof AbstractClientPlayer) {

@@ -5,13 +5,12 @@ import com.tridevmc.molecule.Molecule;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.util.Random;
 
 public class TestMessage extends Message {
 
@@ -54,7 +53,7 @@ public class TestMessage extends Message {
             this.myItemStack = Items.TRIDENT.getDefaultInstance();
             this.myTag = new CompoundTag();
             this.myTag.putFloat("Float", 4F);
-            Random rand = new Random();
+            var rand = RandomSource.create();
             this.myPos = new BlockPos(rand.nextInt(511), rand.nextInt(255), rand.nextInt(511));
             this.myFacing = Direction.getRandom(rand);
 

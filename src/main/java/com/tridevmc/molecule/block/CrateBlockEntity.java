@@ -1,7 +1,6 @@
 package com.tridevmc.molecule.block;
 
 import com.tridevmc.molecule.init.MoleculeContent;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -30,9 +29,9 @@ public class CrateBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
+    public void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
         compound.put("inv", this.inventory.serializeNBT());
-        return super.save(compound);
     }
 
     @Nonnull

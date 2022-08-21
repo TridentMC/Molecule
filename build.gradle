@@ -1,11 +1,7 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
 }
 
 apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
@@ -13,15 +9,12 @@ modBaseName = "molecule"
 
 evaluationDependsOn(':Compound')
 
-apply plugin: 'net.minecraftforge.gradle'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
 
 version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
     mappings channel: mappingsChannel, version: mappingsVersion
@@ -82,6 +75,10 @@ jar {
                     "Implementation-Vendor"   : "Trident",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
 jar.finalizedBy('reobfJar')

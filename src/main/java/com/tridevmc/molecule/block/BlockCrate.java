@@ -3,7 +3,6 @@ package com.tridevmc.molecule.block;
 import com.tridevmc.molecule.ui.CrateMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,20 +15,19 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
 public class BlockCrate extends BaseEntityBlock {
     public BlockCrate(Properties builder) {
         super(builder);
-        this.setRegistryName("molecule:crate");
     }
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer && level.getBlockEntity(pos) instanceof CrateBlockEntity) {
-            NetworkHooks.openGui((ServerPlayer) player, new MenuProvider() {
+            NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
                 @Nullable
                 @Override
                 public AbstractContainerMenu createMenu(int id, Inventory playerInv, Player player) {
@@ -38,7 +36,7 @@ public class BlockCrate extends BaseEntityBlock {
 
                 @Override
                 public Component getDisplayName() {
-                    return new TextComponent("");
+                    return Component.empty();
                 }
             }, pos);
         }
