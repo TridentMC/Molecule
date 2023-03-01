@@ -12,4 +12,5 @@ public class ServerTestMessage extends TestMessage {
     public ServerTestMessage(boolean genValues) {
         super(genValues);
     }
+
 }

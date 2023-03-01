@@ -13,6 +13,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class CrateMenu extends CompoundContainerMenu {
+
     private final CrateBlockEntity crate;
     private final IItemHandler inventory;
 

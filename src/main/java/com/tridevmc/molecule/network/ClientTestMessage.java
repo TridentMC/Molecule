@@ -13,4 +13,5 @@ public class ClientTestMessage extends TestMessage {
     public ClientTestMessage(boolean genValues) {
         super(genValues);
     }
+
 }

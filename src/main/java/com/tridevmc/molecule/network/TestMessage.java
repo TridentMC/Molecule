@@ -85,4 +85,5 @@ public class TestMessage extends Message {
     public void handle(Player player) {
         Molecule.LOG.info("Received {}, {}", this.getClass().getName(), this.toString());
     }
+
 }

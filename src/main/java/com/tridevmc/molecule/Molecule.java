@@ -30,7 +30,6 @@ public final class Molecule {
 
     public static final Logger LOG = LogManager.getLogger(Molecule.NAME);
     public static CommonProxy PROXY;
-    public static MoleculeItemGroup CREATIVE_TAB = new MoleculeItemGroup(Molecule.NAME);
     public static Molecule INSTANCE;
     public static MoleculeConfig CONFIG;
 

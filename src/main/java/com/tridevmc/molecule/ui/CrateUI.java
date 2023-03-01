@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public class CrateUI extends CompoundUIContainer<CrateMenu> {
+
     public CrateUI(CrateMenu container, Inventory inventory, Component name) {
         super(container);
     }
@@ -39,4 +40,5 @@ public class CrateUI extends CompoundUIContainer<CrateMenu> {
         ElementButton button = new ElementButton(new Rect2F(-50, 50, 50, 50), new LayoutRelative(bg));
         this.addElement(button);
     }
+
 }

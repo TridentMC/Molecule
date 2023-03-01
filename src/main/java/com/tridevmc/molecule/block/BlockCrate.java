@@ -20,6 +20,7 @@ import net.minecraftforge.network.NetworkHooks;
 import javax.annotation.Nullable;
 
 public class BlockCrate extends BaseEntityBlock {
+
     public BlockCrate(Properties builder) {
         super(builder);
     }
@@ -50,4 +51,5 @@ public class BlockCrate extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CrateBlockEntity(pos, state);
     }
+
 }

@@ -14,4 +14,5 @@ public class ClientProxy extends CommonProxy {
         //ModelLoader.setCustomModelResourceLocation(item, meta,
         //    new ModelResourceLocation(Molecule.MOD_ID + ":" + id, "inventory"));
     }
+
 }

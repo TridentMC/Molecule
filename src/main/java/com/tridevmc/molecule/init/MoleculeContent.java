@@ -9,18 +9,21 @@ import com.tridevmc.molecule.ui.CrateMenu;
 import com.tridevmc.molecule.ui.CrateUI;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -38,6 +41,17 @@ public class MoleculeContent {
         e.register(ForgeRegistries.Keys.ITEMS, MoleculeContent::registerItemBlocks);
         e.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, MoleculeContent::registerBlockEntityTypes);
         e.register(ForgeRegistries.Keys.MENU_TYPES, MoleculeContent::registerMenus);
+    }
+
+    @SubscribeEvent
+    public static void onCreativeTabRegisterEvent(CreativeModeTabEvent.Register e) {
+        e.registerCreativeModeTab(new ResourceLocation(Molecule.MOD_ID, "molecule"),
+                b -> b.title(Component.literal("Molecule"))
+                        .icon(() -> new ItemStack(CRATE))
+                        .displayItems((enabledFlags, populator, hasPermissions) -> {
+                            populator.accept(new ItemStack(CRATE));
+                        })
+        );
     }
 
     public static void registerBlocks(RegisterEvent.RegisterHelper<Block> registry) {
@@ -77,4 +91,5 @@ public class MoleculeContent {
         registry.register(name, type);
         return type;
     }
+
 }
