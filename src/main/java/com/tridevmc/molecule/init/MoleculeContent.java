@@ -15,6 +15,7 @@ import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -48,9 +49,7 @@ public class MoleculeContent {
         e.registerCreativeModeTab(new ResourceLocation(Molecule.MOD_ID, "molecule"),
                 b -> b.title(Component.literal("Molecule"))
                         .icon(() -> new ItemStack(CRATE))
-                        .displayItems((enabledFlags, populator, hasPermissions) -> {
-                            populator.accept(new ItemStack(CRATE));
-                        })
+                        .displayItems((itemDisplayParameters, output) -> output.accept(new ItemStack(CRATE)))
         );
     }
 
@@ -79,7 +78,7 @@ public class MoleculeContent {
     private static <T extends BlockEntity> BlockEntityType<T> registerTile(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry, ResourceLocation name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier) {
         Type<?> fixer = null;
         try {
-            fixer = DataFixers.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().getWorldVersion())).getChoiceType(References.BLOCK_ENTITY, name.toString());
+            fixer = DataFixers.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().getProtocolVersion())).getChoiceType(References.BLOCK_ENTITY, name.toString());
         } catch (IllegalArgumentException e) {
             if (SharedConstants.IS_RUNNING_IN_IDE) {
                 throw e;
