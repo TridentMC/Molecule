@@ -15,16 +15,14 @@ import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,7 +30,7 @@ import net.minecraftforge.registries.RegisterEvent;
 
 public class MoleculeContent {
 
-    public static BlockCrate CRATE = new BlockCrate(Block.Properties.of(Material.WOOD));
+    public static BlockCrate CRATE = new BlockCrate(Block.Properties.of().mapColor(MapColor.WOOD));
     public static BlockEntityType<CrateBlockEntity> CRATE_TILE;
     public static MenuType<CrateMenu> CRATE_MENU;
 
@@ -44,14 +42,14 @@ public class MoleculeContent {
         e.register(ForgeRegistries.Keys.MENU_TYPES, MoleculeContent::registerMenus);
     }
 
-    @SubscribeEvent
-    public static void onCreativeTabRegisterEvent(CreativeModeTabEvent.Register e) {
-        e.registerCreativeModeTab(new ResourceLocation(Molecule.MOD_ID, "molecule"),
-                b -> b.title(Component.literal("Molecule"))
-                        .icon(() -> new ItemStack(CRATE))
-                        .displayItems((itemDisplayParameters, output) -> output.accept(new ItemStack(CRATE)))
-        );
-    }
+    //@SubscribeEvent
+    //public static void onCreativeTabRegisterEvent(CreativeModeTabEvent.Register e) {
+    //    //e.registerCreativeModeTab(new ResourceLocation(Molecule.MOD_ID, "molecule"),
+    //    //                          b -> b.title(Component.literal("Molecule"))
+    //    //                                  .icon(() -> new ItemStack(CRATE))
+    //    //                                  .displayItems((itemDisplayParameters, output) -> output.accept(new ItemStack(CRATE)))
+    //    //);
+    //}
 
     public static void registerBlocks(RegisterEvent.RegisterHelper<Block> registry) {
         registry.register(new ResourceLocation("molecule", "crate"), CRATE);
