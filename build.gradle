@@ -1,7 +1,7 @@
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
 }
 
 apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
@@ -18,6 +18,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
     mappings channel: mappingsChannel, version: mappingsVersion
+
+    copyIdeResources = true
 
     runs {
         client {
@@ -61,7 +63,7 @@ configurations {
 dependencies {
     compileOnly project(':Compound')
 
-    minecraft "net.minecraftforge:forge:${forgeVersion}"
+    minecraft "net.neoforged:forge:${forgeVersion}"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
