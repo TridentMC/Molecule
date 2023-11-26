@@ -9,24 +9,21 @@ import com.tridevmc.molecule.ui.CrateMenu;
 import com.tridevmc.molecule.ui.CrateUI;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.network.chat.Component;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 public class MoleculeContent {
 
@@ -36,10 +33,10 @@ public class MoleculeContent {
 
     @SubscribeEvent
     public static void onRegisterEvent(final RegisterEvent e) {
-        e.register(ForgeRegistries.Keys.BLOCKS, MoleculeContent::registerBlocks);
-        e.register(ForgeRegistries.Keys.ITEMS, MoleculeContent::registerItemBlocks);
-        e.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, MoleculeContent::registerBlockEntityTypes);
-        e.register(ForgeRegistries.Keys.MENU_TYPES, MoleculeContent::registerMenus);
+        e.register(BuiltInRegistries.BLOCK.key(), MoleculeContent::registerBlocks);
+        e.register(BuiltInRegistries.ITEM.key(), MoleculeContent::registerItemBlocks);
+        e.register(BuiltInRegistries.BLOCK_ENTITY_TYPE.key(), MoleculeContent::registerBlockEntityTypes);
+        e.register(BuiltInRegistries.MENU.key(), MoleculeContent::registerMenus);
     }
 
     //@SubscribeEvent
@@ -60,9 +57,11 @@ public class MoleculeContent {
     }
 
     public static void registerMenus(RegisterEvent.RegisterHelper<MenuType<?>> registry) {
-        CRATE_MENU = IForgeMenuType.create(CrateMenu::new);
+        CRATE_MENU = IMenuTypeExtension.create(CrateMenu::new);
         registry.register(new ResourceLocation("molecule", "crate"), CRATE_MENU);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> MoleculeContent::registerScreens);
+        if(FMLEnvironment.dist.isClient()) {
+            MoleculeContent.registerScreens();
+        }
     }
 
     public static void registerScreens() {

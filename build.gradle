@@ -1,14 +1,15 @@
 plugins {
+    id 'java-library'
     id 'eclipse'
+    id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
+    id 'net.neoforged.gradle.userdev' version '7.0.45'
 }
 
 apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
 modBaseName = "molecule"
 
 evaluationDependsOn(':Compound')
-
 
 version = modVersion
 group = modGroup
@@ -17,44 +18,41 @@ archivesBaseName = modBaseName
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: mappingsChannel, version: mappingsVersion
-
-    copyIdeResources = true
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                molecule {
-                    sources sourceSets.main, project(':Compound').sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                molecule {
-                    sources sourceSets.main, project(':Compound').sourceSets.main
-                }
-            }
-        }
+    mappings {
+        version(mappingsVersion)
     }
 }
+
+runs {
+    configureEach {
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+        systemProperty 'forge.logging.console.level', 'debug'
+
+        modSources = [
+                project.sourceSets.main,
+                project(":Compound").sourceSets.main
+        ]
+    }
+
+    client {
+        systemProperty 'forge.enabledGameTestNamespaces', project.modBaseName
+    }
+
+    server {
+        systemProperty 'forge.enabledGameTestNamespaces', project.modBaseName
+        programArgument '--nogui'
+    }
+
+    gameTestServer {
+        systemProperty 'forge.enabledGameTestNamespaces', project.modBaseName
+    }
+
+    data {
+        programArguments.addAll '--mod', project.modBaseName, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
 
 configurations {
     runtime.exclude group: 'com.tridevmc.compound'
@@ -63,7 +61,7 @@ configurations {
 dependencies {
     compileOnly project(':Compound')
 
-    minecraft "net.neoforged:forge:${forgeVersion}"
+    implementation "net.neoforged:neoforge:${forgeVersion}"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

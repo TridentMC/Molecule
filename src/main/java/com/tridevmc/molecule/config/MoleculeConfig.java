@@ -5,7 +5,7 @@ import com.tridevmc.compound.config.ConfigType;
 import com.tridevmc.compound.config.ConfigValue;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;

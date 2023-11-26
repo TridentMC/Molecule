@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[32,)"
+loaderVersion = "[1,)"
 license = "MIT License - Copyright (c) 2019 Trident"
 [[mods]]
 modId = "molecule"

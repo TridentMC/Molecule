@@ -10,14 +10,14 @@ import com.tridevmc.molecule.proxy.ClientProxy;
 import com.tridevmc.molecule.proxy.CommonProxy;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +35,7 @@ public final class Molecule {
 
     public Molecule() {
         INSTANCE = this;
-        PROXY = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+        PROXY = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
 
         FMLJavaModLoadingContext loadingContext = FMLJavaModLoadingContext.get();
         loadingContext.getModEventBus().addListener(this::onSetup);
@@ -56,7 +56,7 @@ public final class Molecule {
 
     private void onSetup(FMLCommonSetupEvent e) {
         PROXY.setup();
-        MinecraftForge.EVENT_BUS.register(Molecule.class);
+        NeoForge.EVENT_BUS.register(Molecule.class);
         CompoundNetwork.createNetwork(ModLoadingContext.get().getActiveContainer(), "molecule");
     }
 
