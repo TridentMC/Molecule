@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.45'
+    id 'net.neoforged.gradle.userdev' version '7.0.52'
 }
 
 apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
@@ -23,16 +23,31 @@ minecraft {
     }
 }
 
+configurations {
+    runtime.exclude group: 'com.tridevmc.compound'
+
+    compoundProjectDependency {}
+    implementation.extendsFrom compoundProjectDependency
+}
+
+dependencies {
+    //implementation project(':Compound')
+    compoundProjectDependency project(':Compound')
+
+    implementation "net.neoforged:neoforge:${forgeVersion}"
+}
+
 runs {
     configureEach {
         systemProperty 'forge.logging.markers', 'REGISTRIES'
 
         systemProperty 'forge.logging.console.level', 'debug'
 
-        modSources = [
-                project.sourceSets.main,
-                project(":Compound").sourceSets.main
-        ]
+        modSource project.sourceSets.main
+
+        dependencies {
+            runtime configuration(project.configurations.compoundProjectDependency)
+        }
     }
 
     client {
@@ -53,16 +68,6 @@ runs {
     }
 }
 
-
-configurations {
-    runtime.exclude group: 'com.tridevmc.compound'
-}
-
-dependencies {
-    compileOnly project(':Compound')
-
-    implementation "net.neoforged:neoforge:${forgeVersion}"
-}
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
