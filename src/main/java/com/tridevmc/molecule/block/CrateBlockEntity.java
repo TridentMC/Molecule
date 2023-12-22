@@ -6,9 +6,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 
@@ -35,14 +32,6 @@ public class CrateBlockEntity extends BlockEntity {
         compound.put("inv", this.inventory.serializeNBT());
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap.equals(Capabilities.ITEM_HANDLER)) {
-            return LazyOptional.of(() -> (T) this.inventory);
-        }
 
-        return super.getCapability(cap, side);
-    }
 
 }

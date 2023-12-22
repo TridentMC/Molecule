@@ -23,16 +23,19 @@ minecraft {
     }
 }
 
-configurations {
-    runtime.exclude group: 'com.tridevmc.compound'
-
-    compoundProjectDependency {}
-    implementation.extendsFrom compoundProjectDependency
+// Add the sourceSets from the Compound project to this project, we can't use it as a dependency because NeoGradle gets confused.
+sourceSets {
+    main {
+        java {
+            srcDirs += project(':Compound').sourceSets.main.java.srcDirs
+        }
+        resources {
+            srcDirs += project(':Compound').sourceSets.main.resources.srcDirs
+        }
+    }
 }
 
 dependencies {
-    compoundProjectDependency project(':Compound')
-
     implementation "net.neoforged:neoforge:${forgeVersion}"
 }
 
@@ -42,11 +45,7 @@ runs {
 
         systemProperty 'forge.logging.console.level', 'debug'
 
-        modSource project.sourceSets.main
-
-        dependencies {
-            runtime configuration(project.configurations.compoundProjectDependency)
-        }
+        modSources.add(project.sourceSets.main)
     }
 
     client {

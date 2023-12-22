@@ -10,6 +10,7 @@ import com.tridevmc.molecule.proxy.ClientProxy;
 import com.tridevmc.molecule.proxy.CommonProxy;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
@@ -37,9 +38,10 @@ public final class Molecule {
         INSTANCE = this;
         PROXY = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
 
-        FMLJavaModLoadingContext loadingContext = FMLJavaModLoadingContext.get();
-        loadingContext.getModEventBus().addListener(this::onSetup);
-        loadingContext.getModEventBus().register(MoleculeContent.class);
+        ModLoadingContext loadingContext = ModLoadingContext.get();
+        IEventBus eventBus = loadingContext.getActiveContainer().getEventBus();
+        eventBus.addListener(this::onSetup);
+        eventBus.register(MoleculeContent.class);
 
         CONFIG = CompoundConfig.of(MoleculeConfig.class, ModLoadingContext.get().getActiveContainer());
     }
