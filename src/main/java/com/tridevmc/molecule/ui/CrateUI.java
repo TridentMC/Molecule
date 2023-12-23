@@ -3,7 +3,6 @@ package com.tridevmc.molecule.ui;
 import com.tridevmc.compound.ui.Rect2F;
 import com.tridevmc.compound.ui.container.CompoundUIContainer;
 import com.tridevmc.compound.ui.element.ElementBox;
-import com.tridevmc.compound.ui.element.button.ElementButton;
 import com.tridevmc.compound.ui.layout.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
