@@ -37,8 +37,8 @@ public class CrateUI extends CompoundUIContainer<CrateMenu> {
             }
         }
 
-        ElementButton button = new ElementButton(new Rect2F(-50, 50, 50, 50), new LayoutRelative(bg));
-        this.addElement(button);
+        //ElementButton button = new ElementButton(new Rect2F(-50, 50, 50, 50), new LayoutRelative(bg));
+        //this.addElement(button);
     }
 
 }
