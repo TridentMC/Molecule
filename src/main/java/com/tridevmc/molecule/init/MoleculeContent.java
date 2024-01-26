@@ -73,17 +73,7 @@ public class MoleculeContent {
     }
 
     private static <T extends BlockEntity> BlockEntityType<T> registerTile(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry, ResourceLocation name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier) {
-        Type<?> fixer = null;
-        try {
-            fixer = DataFixers.getDataFixer().getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().getProtocolVersion())).getChoiceType(References.BLOCK_ENTITY, name.toString());
-        } catch (IllegalArgumentException e) {
-            if (SharedConstants.IS_RUNNING_IN_IDE) {
-                throw e;
-            }
-
-            Molecule.LOG.warn("No data fixer registered for tile {}", name.toString());
-        }
-        BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntitySupplier).build(fixer);
+        BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntitySupplier).build(null);
         registry.register(name, type);
         return type;
     }
