@@ -17,9 +17,14 @@ archivesBaseName = modBaseName
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-minecraft {
-    mappings {
-        version(mappingsVersion)
+if (ext.mappingsChannel == "parchment") {
+    var parchmentMCVersion = ext.mappingsMinecraftVersion
+    var parchmentMappingsVersion = ext.mappingsVersion
+    subsystems {
+        parchment {
+            setMinecraftVersion(parchmentMCVersion)
+            setMappingsVersion(parchmentMappingsVersion)
+        }
     }
 }
 
@@ -83,5 +88,3 @@ jar {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
-
-jar.finalizedBy('reobfJar')
