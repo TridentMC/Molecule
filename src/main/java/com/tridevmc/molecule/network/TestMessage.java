@@ -74,7 +74,7 @@ public class TestMessage extends Message {
                 .append("myOtherBoolean", this.myOtherBoolean)
                 .append("myChar", this.myChar)
                 .append("myString", this.myString)
-                .append("myItemStack", this.myItemStack.getItem() + ":" + this.myItemStack.getTag())
+                .append("myItemStack", this.myItemStack.getItem() + ":" + this.myItemStack.getDamageValue())
                 .append("myTag", this.myTag)
                 .append("myPos", this.myPos)
                 .append("myFacing", this.myFacing.toString())

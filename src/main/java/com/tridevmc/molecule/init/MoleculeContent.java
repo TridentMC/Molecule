@@ -1,18 +1,11 @@
 package com.tridevmc.molecule.init;
 
-import com.mojang.datafixers.DataFixUtils;
-import com.mojang.datafixers.types.Type;
-import com.tridevmc.molecule.Molecule;
 import com.tridevmc.molecule.block.BlockCrate;
 import com.tridevmc.molecule.block.CrateBlockEntity;
 import com.tridevmc.molecule.ui.CrateMenu;
 import com.tridevmc.molecule.ui.CrateUI;
-import net.minecraft.SharedConstants;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.datafix.DataFixers;
-import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -21,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -59,13 +52,11 @@ public class MoleculeContent {
     public static void registerMenus(RegisterEvent.RegisterHelper<MenuType<?>> registry) {
         CRATE_MENU = IMenuTypeExtension.create(CrateMenu::new);
         registry.register(new ResourceLocation("molecule", "crate"), CRATE_MENU);
-        if(FMLEnvironment.dist.isClient()) {
-            MoleculeContent.registerScreens();
-        }
     }
 
-    public static void registerScreens() {
-        MenuScreens.register(CRATE_MENU, CrateUI::new);
+    @SubscribeEvent
+    public static void onRegisterMenuScreensEvent(RegisterMenuScreensEvent e) {
+        e.register(CRATE_MENU, CrateUI::new);
     }
 
     public static void registerBlockEntityTypes(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry) {

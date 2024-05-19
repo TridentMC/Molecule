@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '[7.0.57,8.0)'
+    id 'net.neoforged.gradle.userdev' version '[7.0.124,7.0.130)'
 }
 
 apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
@@ -15,7 +15,7 @@ version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 if (ext.mappingsChannel == "parchment") {
     var parchmentMCVersion = ext.mappingsMinecraftVersion
@@ -72,12 +72,12 @@ runs {
 }
 
 
-// Example for how to get properties into the manifest for reading by the runtime..
+// Example for how to get properties into the manifest for reading by the runtime.
 jar {
     manifest {
         attributes(["Specification-Title"     : "Molecule",
                     "Specification-Vendor"    : "Trident",
-                    "Specification-Version"   : "24.0", // We are version 1 of the modlauncher specification
+                    "Specification-Version"   : "24.0",
                     "Implementation-Title"    : project.name,
                     "Implementation-Version"  : "${version}",
                     "Implementation-Vendor"   : "Trident",
@@ -87,4 +87,11 @@ jar {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }
