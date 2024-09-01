@@ -42,16 +42,16 @@ public class MoleculeContent {
     //}
 
     public static void registerBlocks(RegisterEvent.RegisterHelper<Block> registry) {
-        registry.register(new ResourceLocation("molecule", "crate"), CRATE);
+        registry.register(ResourceLocation.fromNamespaceAndPath("molecule", "crate"), CRATE);
     }
 
     public static void registerItemBlocks(RegisterEvent.RegisterHelper<Item> registry) {
-        registry.register(new ResourceLocation("molecule", "crateitem"), new BlockItem(CRATE, new Item.Properties()));
+        registry.register(ResourceLocation.fromNamespaceAndPath("molecule", "crateitem"), new BlockItem(CRATE, new Item.Properties()));
     }
 
     public static void registerMenus(RegisterEvent.RegisterHelper<MenuType<?>> registry) {
         CRATE_MENU = IMenuTypeExtension.create(CrateMenu::new);
-        registry.register(new ResourceLocation("molecule", "crate"), CRATE_MENU);
+        registry.register(ResourceLocation.fromNamespaceAndPath("molecule", "crate"), CRATE_MENU);
     }
 
     @SubscribeEvent
@@ -60,11 +60,11 @@ public class MoleculeContent {
     }
 
     public static void registerBlockEntityTypes(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry) {
-        CRATE_TILE = registerTile(registry, new ResourceLocation("molecule", "crate"), CrateBlockEntity::new);
+        CRATE_TILE = registerTile(registry, ResourceLocation.fromNamespaceAndPath("molecule", "crate"), CrateBlockEntity::new, CRATE);
     }
 
-    private static <T extends BlockEntity> BlockEntityType<T> registerTile(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry, ResourceLocation name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier) {
-        BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntitySupplier).build(null);
+    private static <T extends BlockEntity> BlockEntityType<T> registerTile(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry, ResourceLocation name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, Block... validBlocks) {
+        BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntitySupplier, validBlocks).build(null);
         registry.register(name, type);
         return type;
     }

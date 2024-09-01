@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '[7.0.124,7.0.130)'
+    id 'net.neoforged.moddev' version '1.0.17'
 }
 
 apply from: "./Compound/properties.gradle" // we have to have Compound here to even compile, just snag the version and group data from it directly.
@@ -17,18 +17,6 @@ archivesBaseName = modBaseName
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-if (ext.mappingsChannel == "parchment") {
-    var parchmentMCVersion = ext.mappingsMinecraftVersion
-    var parchmentMappingsVersion = ext.mappingsVersion
-    subsystems {
-        parchment {
-            setMinecraftVersion(parchmentMCVersion)
-            setMappingsVersion(parchmentMappingsVersion)
-        }
-    }
-}
-
-// Add the sourceSets from the Compound project to this project, we can't use it as a dependency because NeoGradle gets confused.
 sourceSets {
     main {
         java {
@@ -40,35 +28,51 @@ sourceSets {
     }
 }
 
-dependencies {
-    implementation "net.neoforged:neoforge:${forgeVersion}"
+neoForge {
+    version = neoForgeVersion
+
+    if  (mappingsChannel == "parchment") {
+        parchment {
+            mappingsVersion =  project.mappingsVersion
+            minecraftVersion =  project.mappingsMinecraftVersion
+        }
+    }
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.modBaseName
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.modBaseName
+        }
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.modBaseName
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        // define mod <-> source bindings
+        // these are used to tell the game which sources are for which mod
+        // mostly optional in a single mod project
+        // but multi mod projects should define one per mod
+        "${project.modBaseName}" {
+            sourceSet(sourceSets.main)
+        }
+    }
 }
 
-runs {
-    configureEach {
-        systemProperty 'forge.logging.markers', 'REGISTRIES'
-
-        systemProperty 'forge.logging.console.level', 'debug'
-
-        modSources.add(project.sourceSets.main)
-    }
-
-    client {
-        systemProperty 'forge.enabledGameTestNamespaces', project.modBaseName
-    }
-
-    server {
-        systemProperty 'forge.enabledGameTestNamespaces', project.modBaseName
-        programArgument '--nogui'
-    }
-
-    gameTestServer {
-        systemProperty 'forge.enabledGameTestNamespaces', project.modBaseName
-    }
-
-    data {
-        programArguments.addAll '--mod', project.modBaseName, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-    }
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
 }
 
 
