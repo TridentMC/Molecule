@@ -5,6 +5,8 @@ import com.tridevmc.molecule.block.CrateBlockEntity;
 import com.tridevmc.molecule.ui.CrateMenu;
 import com.tridevmc.molecule.ui.CrateUI;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -20,7 +22,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 
 public class MoleculeContent {
 
-    public static BlockCrate CRATE = new BlockCrate(Block.Properties.of().mapColor(MapColor.WOOD));
+    public static BlockCrate CRATE = new BlockCrate(Block.Properties.of().mapColor(MapColor.WOOD).setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("molecule", "crate"))));
     public static BlockEntityType<CrateBlockEntity> CRATE_TILE;
     public static MenuType<CrateMenu> CRATE_MENU;
 
@@ -46,7 +48,7 @@ public class MoleculeContent {
     }
 
     public static void registerItemBlocks(RegisterEvent.RegisterHelper<Item> registry) {
-        registry.register(ResourceLocation.fromNamespaceAndPath("molecule", "crateitem"), new BlockItem(CRATE, new Item.Properties()));
+        registry.register(ResourceLocation.fromNamespaceAndPath("molecule", "crateitem"), new BlockItem(CRATE, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("molecule", "crateitem")))));
     }
 
     public static void registerMenus(RegisterEvent.RegisterHelper<MenuType<?>> registry) {
@@ -64,7 +66,7 @@ public class MoleculeContent {
     }
 
     private static <T extends BlockEntity> BlockEntityType<T> registerTile(RegisterEvent.RegisterHelper<BlockEntityType<?>> registry, ResourceLocation name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, Block... validBlocks) {
-        BlockEntityType<T> type = BlockEntityType.Builder.of(blockEntitySupplier, validBlocks).build(null);
+        BlockEntityType<T> type = new BlockEntityType<>(blockEntitySupplier, validBlocks);
         registry.register(name, type);
         return type;
     }
