@@ -44,7 +44,7 @@ public class CrateMenu extends CompoundContainerMenu {
     }
 
     public CrateMenu(int window, Inventory playerInventory, FriendlyByteBuf data) {
-        this(window, playerInventory, playerInventory.player.getCommandSenderWorld().getBlockEntity(data.readBlockPos()));
+        this(window, playerInventory, playerInventory.player.level().getBlockEntity(data.readBlockPos()));
     }
 
     @Override

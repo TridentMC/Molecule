@@ -40,7 +40,7 @@ public class BlockCrate extends BaseEntityBlock {
 
     @Override
     public InteractionResult  useWithoutItem(BlockState pState, Level level, BlockPos pos, Player player, BlockHitResult pHitResult) {
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof CrateBlockEntity) {
+        if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof CrateBlockEntity) {
             serverPlayer.openMenu(new MenuProvider() {
                 @Override
                 public @NotNull AbstractContainerMenu createMenu(int id, Inventory playerInv, Player player) {

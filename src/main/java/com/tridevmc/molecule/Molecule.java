@@ -35,7 +35,7 @@ public final class Molecule {
 
     public Molecule() {
         INSTANCE = this;
-        PROXY = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
+        PROXY = FMLEnvironment.getDist().isClient() ? new ClientProxy() : new CommonProxy();
 
         ModLoadingContext loadingContext = ModLoadingContext.get();
         IEventBus eventBus = loadingContext.getActiveContainer().getEventBus();
