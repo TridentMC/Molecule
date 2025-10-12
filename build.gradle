@@ -13,7 +13,10 @@ evaluationDependsOn(':Compound')
 
 version = modVersion
 group = modGroup
-archivesBaseName = modBaseName
+
+base {
+    archivesName = modBaseName
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
