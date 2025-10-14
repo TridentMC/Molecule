@@ -2,10 +2,10 @@ package com.tridevmc.molecule.block;
 
 import com.tridevmc.molecule.init.MoleculeContent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class CrateBlockEntity extends BlockEntity {
@@ -17,15 +17,15 @@ public class CrateBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-        super.loadAdditional(compound, registries);
-        this.inventory.deserializeNBT(registries, compound.getCompound("inv"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.child("inv").ifPresent(inventoryInput -> this.inventory.deserialize(inventoryInput));
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-        super.saveAdditional(compound, registries);
-        compound.put("inv", this.inventory.serializeNBT(registries));
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        this.inventory.serialize(output.child("inv"));
     }
 
 }
