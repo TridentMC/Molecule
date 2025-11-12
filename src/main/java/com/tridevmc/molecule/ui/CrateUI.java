@@ -1,63 +1,97 @@
 package com.tridevmc.molecule.ui;
 
-import com.tridevmc.compound.ui.Rect2F;
-import com.tridevmc.compound.ui.container.CompoundUIContainer;
-import com.tridevmc.compound.ui.element.ElementBox;
-import com.tridevmc.compound.ui.element.ElementLabel;
-import com.tridevmc.compound.ui.element.button.ElementButton;
-import com.tridevmc.compound.ui.layout.*;
-import net.minecraft.client.Minecraft;
+import com.tridevmc.compound.ui.compose.element.*;
+import com.tridevmc.compound.ui.compose.layout.Alignment;
+import com.tridevmc.compound.ui.compose.layout.LayoutProperties;
+import com.tridevmc.compound.ui.compose.screen.ComposedUIContainer;
+import com.tridevmc.compound.ui.compose.scope.RootScope;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class CrateUI extends CompoundUIContainer<CrateMenu> {
+/**
+ * Composed version of the crate UI using the declarative composition system.
+ */
+public class CrateUI extends ComposedUIContainer<CrateMenu> {
 
-    public CrateUI(CrateMenu container, Inventory inventory, Component name) {
-        super(container);
+    public CrateUI(CrateMenu menu, Inventory inventory, Component name) {
+        super(menu);
     }
 
     @Override
-    public void initElements() {
-        // Background box - made taller to accommodate labels
-        ElementBox bg = new ElementBox(new Rect2F(0, 0, 178, 190), new LayoutCentered(true, true));
-        this.addElement(bg);
+    protected void compose(RootScope scope) {
+        // Center everything on screen using Stack that fills the screen
+        scope.e(new Stack(), stack -> {
+            // Make stack fill the entire screen and center its children
+            stack.layout()
+                    .fillMax()
+                    .contentAlignment(Alignment.CENTER);
 
-        // "Crate" label at the top (with shadow for visibility)
-        ElementLabel crateLabel = new ElementLabel(new Rect2F(8, 6, 162, 10), new LayoutRelative(bg),
-            Minecraft.getInstance().font, false, false, false);
-        crateLabel.setText(Component.literal("Crate"));
-        this.addElement(crateLabel);
+            // Background box with default inventory sprite
+            stack.e(new ElementBox(), box -> {
+                // ElementBox just specifies its size
+                box.layout().fixedSize(178, 190);
 
-        // Crate grid - moved down to make room for label
-        LayoutGrid crateGrid = new LayoutGrid(new Rect2F(8, 18, 18 * 9, 18 * 3));
-        ILayout crateLayout = new LayoutMulti(crateGrid, new LayoutRelative(bg));
+                // Fill content slot with Box for padding
+                box.slot(ElementBox.CONTENT_SLOT, content -> {
+                    content.e(new Box(), paddedContent -> {
+                        // Set padding on the box
+                        paddedContent.layout().padding(8);
 
-        // "Inventory" label between crate and player inventory (with shadow for visibility)
-        ElementLabel inventoryLabel = new ElementLabel(new Rect2F(8, 80, 162, 10), new LayoutRelative(bg),
-            Minecraft.getInstance().font, false, false, false);
-        inventoryLabel.setText(Component.literal("Inventory"));
-        this.addElement(inventoryLabel);
+                        // Main content column
+                        paddedContent.e(new Column(), column -> {
+                            // Set spacing on the column
+                            column.layout().spacing(4);
+                            // "Crate" label
+                            column.e(new ElementLabel(
+                                    Component.literal("Crate"),
+                                    0x404040
+                            ));
 
-        // Player inventory grid - adjusted for new label positions
-        LayoutGrid playerGrid = new LayoutGrid(new Rect2F(8, 92, 18 * 9, 18 * 3));
-        ILayout playerLayout = new LayoutMulti(playerGrid, new LayoutRelative(bg));
+                            // Crate slots grid (9x3 = 27 slots)
+                            column.e(new Grid(9, 0, 0), crateGrid -> {
+                                for (int i = 0; i < 27; i++) {
+                                    crateGrid.e(new ComposedSlot(this.getMenu(), i));
+                                }
+                            });
 
-        // Hotbar grid - adjusted for new label positions
-        LayoutGrid hotbarGrid = new LayoutGrid(new Rect2F(8, 154, 18 * 9, 18));
-        ILayout hotbarLayout = new LayoutMulti(hotbarGrid, new LayoutRelative(bg));
+                            // "Inventory" label
+                            column.e(new ElementLabel(
+                                    Component.literal("Inventory"),
+                                    0x404040
+                            ));
 
-        for (int i = 0; i < this.getMenu().slots.size(); i++) {
-            if (i < 27) {
-                crateGrid.registerElement(this.addSlotElement(crateLayout, i));
-            } else if (i < 54) {
-                playerGrid.registerElement(this.addSlotElement(playerLayout, i));
-            } else {
-                hotbarGrid.registerElement(this.addSlotElement(hotbarLayout, i));
-            }
-        }
+                            // Player inventory grid (9x3 = 27 slots)
+                            column.e(new Grid(9, 0, 0), playerGrid -> {
+                                for (int i = 0; i < 27; i++) {
+                                    playerGrid.e(new ComposedSlot(this.getMenu(), 27 + i));
+                                }
+                            });
 
-        ElementButton button = new ElementButton(new Rect2F(-50, 50, 50, 50), new LayoutRelative(bg));
-        this.addElement(button);
+                            // Spacer before hotbar
+                            column.e(new ElementSpacer(0, 4));
+
+                            // Hotbar grid (9x1 = 9 slots)
+                            column.e(new Grid(9, 0, 0), hotbarGrid -> {
+                                for (int i = 0; i < 9; i++) {
+                                    hotbarGrid.e(new ComposedSlot(this.getMenu(), 54 + i));
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
+            // Test button (positioned relative to background)
+            stack.e(new Button(), button -> {
+                // Button specifies its size and margin
+                button.layout()
+                        .fixedSize(50, 50)
+                        .margin(0, 0, 0, 128); // Left offset from center
+
+                button.getElement().addPressListener((x, y) -> {
+                    System.out.println("Button clicked at " + x + ", " + y);
+                });
+            });
+        });
     }
-
 }
