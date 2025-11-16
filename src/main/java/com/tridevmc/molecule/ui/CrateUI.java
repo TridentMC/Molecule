@@ -41,10 +41,11 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                         paddedContent.e(new Column(), column -> {
                             // Set spacing on the column
                             column.layout().spacing(4);
-                            // "Crate" label
+                            // "Crate" label - no shadow for Minecraft inventory style
                             column.e(new ElementLabel(
                                     Component.literal("Crate"),
-                                    0x404040
+                                    0x404040,
+                                    false  // No shadow for inventory labels
                             ));
 
                             // Crate slots grid (9x3 = 27 slots)
@@ -54,10 +55,11 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                 }
                             });
 
-                            // "Inventory" label
+                            // "Inventory" label - no shadow for Minecraft inventory style
                             column.e(new ElementLabel(
                                     Component.literal("Inventory"),
-                                    0x404040
+                                    0x404040,
+                                    false  // No shadow for inventory labels
                             ));
 
                             // Player inventory grid (9x3 = 27 slots)
