@@ -32,7 +32,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                 box.layout().fixedSize(178, 190);
 
                 // Fill content slot with Box for padding
-                box.slot(ElementBox.CONTENT_SLOT, content -> {
+                box.fillSlot(ElementBox.CONTENT_SLOT, content -> {
                     content.e(new Box(), paddedContent -> {
                         // Set padding on the box
                         paddedContent.layout().padding(8);
@@ -84,7 +84,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
             });
 
             // Test button (positioned relative to background)
-            stack.e(new Button(), button -> {
+            /*stack.e(new Button(), button -> {
                 // Button specifies its size and margin
                 button.layout()
                         .fixedSize(50, 50)
@@ -93,7 +93,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                 button.getElement().addPressListener((x, y) -> {
                     System.out.println("Button clicked at " + x + ", " + y);
                 });
-            });
+            });*/
         });
     }
 }
