@@ -1,0 +1,3 @@
+- Always import classes at the top of the file, NEVER use entire names with their packages in front of them. For example, `import com.tridevmc.compound.ui.compose.layout.Bounds; ... Bounds b = ...` should always be used instead of `com.tridevmc.compound.ui.compose.layout.Bounds b = ...`
+- we don't use gradlew in this repo, we use gradle directly.
+- Compound is not a minecraft mod, it is a set of libraries that assist in the development of mods, it does not have a mod class or entrypoint or any event listeners itself. It can not be loaded as a mod, and any attempts to do so will result in a complete failure.
