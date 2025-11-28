@@ -4,6 +4,7 @@ import com.tridevmc.compound.ui.compose.element.*;
 import com.tridevmc.compound.ui.compose.layout.Alignment;
 import com.tridevmc.compound.ui.compose.layout.LayoutProperties;
 import com.tridevmc.compound.ui.compose.screen.ComposedUIContainer;
+import com.tridevmc.compound.ui.compose.scope.IComposableElementScope;
 import com.tridevmc.compound.ui.compose.scope.RootScope;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,10 +27,14 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                     .fillMax()
                     .contentAlignment(Alignment.CENTER);
 
-            // Background box with default inventory sprite
-            stack.e(new ElementBox(), box -> {
-                // ElementBox just specifies its size
-                box.layout().fixedSize(178, 190);
+            // Row to hold main UI and scroll area side by side
+            stack.e(new Row(), row -> {
+                row.layout().spacing(8); // 8px gap between main UI and scroll area
+
+                // Background box with default inventory sprite
+                row.e(new ElementBox(), box -> {
+                    // ElementBox just specifies its size
+                    box.layout().fixedSize(178, 190);
 
                 // Fill content slot with Box for padding
                 box.fillSlot(ElementBox.CONTENT_SLOT, content -> {
@@ -81,19 +86,54 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                         });
                     });
                 });
-            });
-
-            // Test button (positioned relative to background)
-            /*stack.e(new Button(), button -> {
-                // Button specifies its size and margin
-                button.layout()
-                        .fixedSize(50, 50)
-                        .margin(0, 0, 0, 128); // Left offset from center
-
-                button.getElement().addPressListener((x, y) -> {
-                    System.out.println("Button clicked at " + x + ", " + y);
                 });
-            });*/
+
+                // Scrollable list of buttons on the right side
+                row.e(new ElementBox(), scrollBox -> {
+                    scrollBox.layout().fixedSize(120, 190); // Match height of main UI
+
+                    scrollBox.fillSlot(ElementBox.CONTENT_SLOT, content -> {
+                        content.e(new Box(), paddedBox -> {
+                            paddedBox.layout().padding(4);
+
+                            // ScrollArea containing the list of buttons
+                            paddedBox.e(new ScrollArea(), scrollArea -> {
+                                scrollArea.getElement().scrollSpeed(10);
+
+                                // Fill scroll area's content slot with column of buttons
+                                scrollArea.fillSlot(ScrollArea.CONTENT_SLOT, scrollContent -> {
+                                    scrollContent.e(new Column(), buttonColumn -> {
+                                        buttonColumn.layout().spacing(2);
+
+                                        // Create 50 buttons with labels
+                                        for (int i = 1; i <= 50; i++) {
+                                            final int buttonIndex = i;
+                                            buttonColumn.e(new Button(), button -> {
+                                                button.layout()
+                                                        .fillMaxWidth()
+                                                        .fixedHeight(20);
+
+                                                button.getElement().addPressListener((x, y) -> {
+                                                    System.out.println("Clicked button " + buttonIndex);
+                                                });
+
+                                                // Add label to the button via slot
+                                                button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
+                                                    buttonContent.e(new ElementLabel(
+                                                            Component.literal("Button " + buttonIndex),
+                                                            0xFFFFFF,
+                                                            true
+                                                    ));
+                                                });
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
         });
     }
 }
