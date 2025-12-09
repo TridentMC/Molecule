@@ -4,6 +4,7 @@ import com.tridevmc.compound.ui.element.*;
 import com.tridevmc.compound.ui.layout.Alignment;
 import com.tridevmc.compound.ui.scope.RootScope;
 import com.tridevmc.compound.ui.screen.ComposedUIContainer;
+import com.tridevmc.molecule.ui.element.ElementDVDLogo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -100,30 +101,54 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
 
                                 // Fill scroll area's content slot with column of buttons
                                 scrollArea.fillSlot(ScrollArea.CONTENT_SLOT, scrollContent -> {
-                                    scrollContent.e(new Column(), buttonColumn -> {
-                                        buttonColumn.layout().spacing(2);
+                                    scrollContent.e(new Column(), column -> {
+                                        column.layout().spacing(2);
 
-                                        // Create 50 buttons with labels
+                                        // Create 50 items, alternating between normal buttons and custom themed buttons
                                         for (int i = 1; i <= 50; i++) {
-                                            final int buttonIndex = i;
-                                            buttonColumn.e(new Button(), button -> {
-                                                button.layout()
-                                                        .fillMaxWidth()
-                                                        .fixedHeight(20);
+                                            final int index = i;
 
-                                                button.getElement().addPressListener((x, y) -> {
-                                                    System.out.println("Clicked button " + buttonIndex);
-                                                });
+                                            if (i % 2 == 1) {
+                                                // Odd indices: custom themed buttons
+                                                column.e(new Button(), button -> {
+                                                    button.layout()
+                                                            .fillMaxWidth()
+                                                            .fixedHeight(20);
 
-                                                // Add label to the button via slot
-                                                button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
-                                                    buttonContent.e(new ElementLabel(
-                                                            Component.literal("Button " + buttonIndex),
-                                                            0xFFFFFF,
-                                                            true
-                                                    ));
+                                                    button.getElement().addPressListener((x, y) -> {
+                                                        System.out.println("Clicked themed button " + index);
+                                                    });
+
+                                                    // Add label to the button via slot
+                                                    button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
+                                                        buttonContent.e(new ElementLabel(
+                                                                Component.literal("Themed Button " + index),
+                                                                0xFFFFFF,
+                                                                true
+                                                        ));
+                                                    });
                                                 });
-                                            });
+                                            } else {
+                                                // Even indices: buttons
+                                                column.e(new Button(), button -> {
+                                                    button.layout()
+                                                            .fillMaxWidth()
+                                                            .fixedHeight(20);
+
+                                                    button.getElement().addPressListener((x, y) -> {
+                                                        System.out.println("Clicked button " + index);
+                                                    });
+
+                                                    // Add label to the button via slot
+                                                    button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
+                                                        buttonContent.e(new ElementLabel(
+                                                                Component.literal("Button " + index),
+                                                                0xFFFFFF,
+                                                                true
+                                                        ));
+                                                    });
+                                                });
+                                            }
                                         }
                                     });
                                 });
@@ -131,6 +156,12 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                         });
                     });
                 });
+            });
+
+            // DVD Logo overlay - bounces around the entire screen
+            stack.e((IComposableElement) new ElementDVDLogo(), logo -> {
+                // The logo will position itself absolutely within the container
+                // Don't give it any layout bounds since it positions itself
             });
         });
     }
