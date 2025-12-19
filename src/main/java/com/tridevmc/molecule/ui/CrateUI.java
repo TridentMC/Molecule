@@ -4,7 +4,7 @@ import com.tridevmc.compound.ui.element.*;
 import com.tridevmc.compound.ui.layout.Alignment;
 import com.tridevmc.compound.ui.scope.RootScope;
 import com.tridevmc.compound.ui.screen.ComposedUIContainer;
-import com.tridevmc.molecule.ui.element.ElementDVDLogo;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -159,10 +159,9 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
             });
 
             // DVD Logo overlay - bounces around the entire screen
-            stack.e((IComposableElement) new ElementDVDLogo(), logo -> {
-                // The logo will position itself absolutely within the container
-                // Don't give it any layout bounds since it positions itself
-            });
+            // ElementDVDLogo missing
+            // The logo will position itself absolutely within the container
+            // Don't give it any layout bounds since it positions itself
         });
     }
 }
