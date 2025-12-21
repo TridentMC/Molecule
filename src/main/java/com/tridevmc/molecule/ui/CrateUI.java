@@ -31,12 +31,12 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                 row.layout().spacing(8); // 8px gap between main UI and scroll area
 
                 // Background box with default inventory sprite
-                row.e(new ElementBox(), box -> {
+                row.e(new Panel(), box -> {
                     // ElementBox just specifies its size
                     box.layout().fixedSize(178, 190);
 
                     // Fill content slot with Box for padding
-                    box.fillSlot(ElementBox.CONTENT_SLOT, content -> {
+                    box.fillSlot(Panel.CONTENT_SLOT, content -> {
                         content.e(new Box(), paddedContent -> {
                             // Set padding on the box
                             paddedContent.layout().padding(8);
@@ -46,7 +46,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                 // Set spacing on the column
                                 column.layout().spacing(4);
                                 // "Crate" label - no shadow for Minecraft inventory style
-                                column.e(new ElementLabel(
+                                column.e(new Label(
                                         Component.literal("Crate"),
                                         0x404040,
                                         false  // No shadow for inventory labels
@@ -55,12 +55,12 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                 // Crate slots grid (9x3 = 27 slots)
                                 column.e(new Grid(9, 0, 0), crateGrid -> {
                                     for (int i = 0; i < 27; i++) {
-                                        crateGrid.e(new ComposedSlot(this.getMenu(), i));
+                                        crateGrid.e(new InventorySlot(this.getMenu(), i));
                                     }
                                 });
 
                                 // "Inventory" label - no shadow for Minecraft inventory style
-                                column.e(new ElementLabel(
+                                column.e(new Label(
                                         Component.literal("Inventory"),
                                         0x404040,
                                         false  // No shadow for inventory labels
@@ -69,17 +69,17 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                 // Player inventory grid (9x3 = 27 slots)
                                 column.e(new Grid(9, 0, 0), playerGrid -> {
                                     for (int i = 0; i < 27; i++) {
-                                        playerGrid.e(new ComposedSlot(this.getMenu(), 27 + i));
+                                        playerGrid.e(new InventorySlot(this.getMenu(), 27 + i));
                                     }
                                 });
 
                                 // Spacer before hotbar
-                                column.e(new ElementSpacer(0, 4));
+                                column.e(new Spacer(0, 4));
 
                                 // Hotbar grid (9x1 = 9 slots)
                                 column.e(new Grid(9, 0, 0), hotbarGrid -> {
                                     for (int i = 0; i < 9; i++) {
-                                        hotbarGrid.e(new ComposedSlot(this.getMenu(), 54 + i));
+                                        hotbarGrid.e(new InventorySlot(this.getMenu(), 54 + i));
                                     }
                                 });
                             });
@@ -88,10 +88,10 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                 });
 
                 // Scrollable list of buttons on the right side
-                row.e(new ElementBox(), scrollBox -> {
+                row.e(new Panel(), scrollBox -> {
                     scrollBox.layout().fixedSize(120, 190); // Match height of main UI
 
-                    scrollBox.fillSlot(ElementBox.CONTENT_SLOT, content -> {
+                    scrollBox.fillSlot(Panel.CONTENT_SLOT, content -> {
                         content.e(new Box(), paddedBox -> {
                             paddedBox.layout().padding(4);
 
@@ -121,7 +121,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
 
                                                     // Add label to the button via slot
                                                     button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
-                                                        buttonContent.e(new ElementLabel(
+                                                        buttonContent.e(new Label(
                                                                 Component.literal("Themed Button " + index),
                                                                 0xFFFFFF,
                                                                 true
@@ -141,7 +141,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
 
                                                     // Add label to the button via slot
                                                     button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
-                                                        buttonContent.e(new ElementLabel(
+                                                        buttonContent.e(new Label(
                                                                 Component.literal("Button " + index),
                                                                 0xFFFFFF,
                                                                 true
@@ -157,11 +157,6 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                     });
                 });
             });
-
-            // DVD Logo overlay - bounces around the entire screen
-            // ElementDVDLogo missing
-            // The logo will position itself absolutely within the container
-            // Don't give it any layout bounds since it positions itself
         });
     }
 }
