@@ -87,7 +87,7 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                     });
                 });
 
-                // Scrollable list of buttons on the right side
+                // Scrollable list of text inputs on the right side
                 row.e(new Panel(), scrollBox -> {
                     scrollBox.layout().fixedSize(120, 190); // Match height of main UI
 
@@ -95,57 +95,43 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                         content.e(new Box(), paddedBox -> {
                             paddedBox.layout().padding(4);
 
-                            // ScrollArea containing the list of buttons
+                            // ScrollArea containing the list of text inputs
                             paddedBox.e(new ScrollArea(), scrollArea -> {
                                 scrollArea.getElement().scrollSpeed(10);
 
-                                // Fill scroll area's content slot with column of buttons
+                                // Fill scroll area's content slot with column of text inputs
                                 scrollArea.fillSlot(ScrollArea.CONTENT_SLOT, scrollContent -> {
                                     scrollContent.e(new Column(), column -> {
                                         column.layout().spacing(2);
 
-                                        // Create 50 items, alternating between normal buttons and custom themed buttons
+                                        // Create alternating buttons and text inputs
                                         for (int i = 1; i <= 50; i++) {
                                             final int index = i;
-
                                             if (i % 2 == 1) {
-                                                // Odd indices: custom themed buttons
-                                                column.e(new Button(), button -> {
-                                                    button.layout()
+                                                // Odd indices: Text inputs
+                                                column.e(new TextInput(), input -> {
+                                                    input.layout()
                                                             .fillMaxWidth()
                                                             .fixedHeight(20);
 
-                                                    button.getElement().addPressListener((x, y) -> {
-                                                        System.out.println("Clicked themed button " + index);
-                                                    });
-
-                                                    // Add label to the button via slot
-                                                    button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
-                                                        buttonContent.e(new Label(
-                                                                Component.literal("Themed Button " + index),
-                                                                0xFFFFFF,
-                                                                true
-                                                        ));
+                                                    input.getElement().setHint(Component.literal("Input " + index));
+                                                    input.getElement().setResponder(text -> {
+                                                        System.out.println("Input " + index + " changed: " + text);
                                                     });
                                                 });
                                             } else {
-                                                // Even indices: buttons
+                                                // Even indices: Buttons
                                                 column.e(new Button(), button -> {
                                                     button.layout()
                                                             .fillMaxWidth()
                                                             .fixedHeight(20);
 
-                                                    button.getElement().addPressListener((x, y) -> {
-                                                        System.out.println("Clicked button " + index);
+                                                    button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
+                                                        buttonContent.e(new Label(Component.literal("Button " + index)));
                                                     });
 
-                                                    // Add label to the button via slot
-                                                    button.fillSlot(Button.CONTENT_SLOT, buttonContent -> {
-                                                        buttonContent.e(new Label(
-                                                                Component.literal("Button " + index),
-                                                                0xFFFFFF,
-                                                                true
-                                                        ));
+                                                    button.getElement().addPressListener((x, y) -> {
+                                                        System.out.println("Button " + index + " pressed at " + x + ", " + y);
                                                     });
                                                 });
                                             }
