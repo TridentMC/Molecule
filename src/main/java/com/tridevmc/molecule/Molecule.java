@@ -31,7 +31,7 @@ public final class Molecule {
     public static final Logger LOG = LogManager.getLogger(Molecule.NAME);
     public static CommonProxy PROXY;
     public static Molecule INSTANCE;
-    public static MoleculeConfig CONFIG;
+    // public static MoleculeConfig CONFIG; // Temporarily disabled
 
     public Molecule() {
         INSTANCE = this;
@@ -42,7 +42,7 @@ public final class Molecule {
         eventBus.addListener(this::onSetup);
         eventBus.register(MoleculeContent.class);
 
-        CONFIG = CompoundConfig.of(MoleculeConfig.class, ModLoadingContext.get().getActiveContainer());
+        // CONFIG = CompoundConfig.of(MoleculeConfig.class, ModLoadingContext.get().getActiveContainer()); // Temporarily disabled
     }
 
     @SubscribeEvent
