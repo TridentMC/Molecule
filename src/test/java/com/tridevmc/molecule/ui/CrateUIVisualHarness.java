@@ -1,90 +1,192 @@
 package com.tridevmc.molecule.ui;
 
+import com.tridevmc.compound.test.MinecraftMockExtension;
 import com.tridevmc.compound.ui.element.*;
 import com.tridevmc.compound.ui.layout.Alignment;
-
-import com.tridevmc.compound.ui.scope.ICompositionScope;
-import com.tridevmc.compound.ui.screen.ComposedUIContainer;
-
+import com.tridevmc.compound.ui.layout.Bounds;
+import com.tridevmc.compound.ui.layout.Constraints;
+import com.tridevmc.compound.ui.layout.Position;
+import com.tridevmc.compound.ui.scope.RootScope;
+import com.tridevmc.compound.ui.tree.ITreeNode;
+import com.tridevmc.compound.ui.tree.UITree;
+import com.tridevmc.compound.ui.visual.BufferedImageScreenContext;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Comprehensive demo UI showcasing the full Compound composable UI framework.
- * Demonstrates containers, scrolling, various inputs, styling, and layout systems.
- */
-public class CrateUI extends ComposedUIContainer<CrateMenu> {
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
-    public CrateUI(CrateMenu menu, Inventory inventory, Component name) {
-        super(menu, inventory, name);
+/**
+ * Visual harness that composes the CrateUI, renders it to a {@link BufferedImageScreenContext},
+ * and saves the result as a PNG for visual debugging.
+ *
+ * <p>Run with: {@code gradle test --tests "CrateUIVisualHarness"}</p>
+ *
+ * <p>Screenshots are saved to {@code build/screenshots/} relative to the project root.</p>
+ */
+@ExtendWith({MinecraftMockExtension.class, MockitoExtension.class})
+public class CrateUIVisualHarness {
+
+    @Mock
+    private AbstractContainerMenu menu;
+
+    private static final String OUTPUT_DIR = "build/screenshots";
+
+    @BeforeEach
+    void configureTextWrapping() {
+        lenient().when(Minecraft.getInstance().font.getSplitter())
+                .thenReturn(new StringSplitter((codePoint, style) -> 6F));
     }
 
-    @Override
-    protected void compose(ICompositionScope scope) {
+    /**
+     * Composes the current CrateUI layout and renders it at 800x600 (standard Minecraft GUI scale).
+     * Saves the result as {@code crate_ui_800x600.png}.
+     */
+    @Test
+    void renderCrateUI() {
+        List<Slot> slots = new ArrayList<>();
+        for (int i = 0; i < 63; i++) {
+            Slot slot = mock(Slot.class);
+            when(this.menu.getSlot(i)).thenReturn(slot);
+            slots.add(slot);
+        }
+
+        UITree tree = composeCrateUI(slots);
+        renderAndSave(tree, 800, 600, "crate_ui_800x600");
+    }
+
+    /**
+     * Renders the CrateUI at different screen sizes to check responsive layout.
+     * Saves results as {@code crate_ui_1024x768.png} and {@code crate_ui_1920x1080.png}.
+     */
+    @Test
+    void renderCrateUIVariousSizes() {
+        List<Slot> slots = new ArrayList<>();
+        for (int i = 0; i < 63; i++) {
+            Slot slot = mock(Slot.class);
+            when(this.menu.getSlot(i)).thenReturn(slot);
+            slots.add(slot);
+        }
+
+        UITree tree = composeCrateUI(slots);
+        renderAndSave(tree, 1024, 768, "crate_ui_1024x768");
+
+        tree = composeCrateUI(slots);
+        renderAndSave(tree, 1920, 1080, "crate_ui_1920x1080");
+    }
+
+    /**
+     * Renders the CrateUI with debug grid overlay showing 18px slot alignment.
+     */
+    @Test
+    void renderCrateUIDebugGrid() {
+        List<Slot> slots = new ArrayList<>();
+        for (int i = 0; i < 63; i++) {
+            Slot slot = mock(Slot.class);
+            when(this.menu.getSlot(i)).thenReturn(slot);
+            slots.add(slot);
+        }
+
+        UITree tree = composeCrateUI(slots);
+        renderAndSave(tree, 800, 600, "crate_ui_debug_grid", true);
+    }
+
+    /**
+     * Dumps the full element tree with bounds for debugging layout issues.
+     */
+    @Test
+    void dumpCrateUITree() {
+        List<Slot> slots = new ArrayList<>();
+        for (int i = 0; i < 63; i++) {
+            Slot slot = mock(Slot.class);
+            when(this.menu.getSlot(i)).thenReturn(slot);
+            slots.add(slot);
+        }
+
+        UITree tree = composeCrateUI(slots);
+        var constraints = new Constraints(0, 800, 0, 600);
+        tree.measureTree(constraints);
+        tree.placeTree(new Position(0, 0), constraints);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== CrateUI Element Tree (800x600) ===\n\n");
+        dumpTree(tree.getRoot(), 0, sb);
+
+        System.out.println(sb);
+    }
+
+    /**
+     * Composes the current CrateUI layout.
+     * Mirrors the composition in {@code CrateUI.compose()} using mocked slots.
+     */
+    private UITree composeCrateUI(List<Slot> slots) {
+        UITree tree = new UITree();
+        RootScope scope = new RootScope(tree);
+
         scope.e(new Stack(), stack -> {
             stack.layout()
                     .fillMax()
                     .contentAlignment(Alignment.CENTER);
 
-            // Main horizontal layout: Inventory panel | Divider | Controls panel
             stack.e(new Row(), mainRow -> {
-                mainRow.layout().spacing(8).verticalAlignment(Alignment.CENTER);
+                mainRow.layout().spacing(8);
 
-                // ===== LEFT PANEL: Classic Minecraft Inventory =====
                 mainRow.e(new Panel(), inventoryPanel -> {
-                    inventoryPanel.layout().fixedSize(176, 168);
+                    inventoryPanel.layout().fixedSize(178, 220);
 
                     inventoryPanel.fillSlot(Panel.CONTENT_SLOT, content -> {
                         content.e(new Box(), padded -> {
-                            padded.layout().padding(7, 6, 7, 7);
+                            padded.layout().padding(8);
 
                             padded.e(new Column(), column -> {
-                                column.layout().spacing(0);
+                                column.layout().spacing(4);
 
-                                // Title with styling
                                 column.e(new Label(
                                         Component.literal("Storage Crate"),
                                         0x404040,
                                         false
                                 ));
 
-                                column.e(new Spacer(0, 2));
+                                column.e(new Divider(0xFF808080, 1),
+                                        div -> div.layout().fillMaxWidth().fixedHeight(1));
 
-                                // Crate slots grid (9x3)
                                 column.e(new Grid(9, 0, 0), crateGrid -> {
                                     for (int i = 0; i < 27; i++) {
-                                        crateGrid.e(new InventorySlot(this.getMenu(), i));
+                                        crateGrid.e(new InventorySlot(this.menu, i));
                                     }
                                 });
 
-                                // Spacer
-                                column.e(new Spacer(0, 3));
+                                column.e(new Spacer(0, 6));
 
-                                // Inventory label
                                 column.e(new Label(
                                         Component.literal("Inventory"),
                                         0x404040,
                                         false
                                 ));
 
-                                column.e(new Spacer(0, 2));
-
-                                // Player inventory (9x3)
                                 column.e(new Grid(9, 0, 0), playerGrid -> {
                                     for (int i = 0; i < 27; i++) {
-                                        playerGrid.e(new InventorySlot(this.getMenu(), 27 + i));
+                                        playerGrid.e(new InventorySlot(this.menu, 27 + i));
                                     }
                                 });
 
-                                // Spacer
                                 column.e(new Spacer(0, 4));
 
-                                // Hotbar (9x1)
                                 column.e(new Grid(9, 0, 0), hotbarGrid -> {
                                     for (int i = 0; i < 9; i++) {
-                                        hotbarGrid.e(new InventorySlot(this.getMenu(), 54 + i));
+                                        hotbarGrid.e(new InventorySlot(this.menu, 54 + i));
                                     }
                                 });
                             });
@@ -92,11 +194,9 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                     });
                 });
 
-                // ===== CENTER DIVIDER =====
                 mainRow.e(new Divider(0xFF606060, 2),
                         div -> div.layout().fixedWidth(2).fixedHeight(220));
 
-                // ===== RIGHT PANEL: Controls Demo =====
                 mainRow.e(new Panel(), controlsPanel -> {
                     controlsPanel.layout().fixedSize(200, 220);
 
@@ -110,9 +210,8 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
 
                                 scrollArea.fillSlot(ScrollArea.CONTENT_SLOT, scrollContent -> {
                                     scrollContent.e(new Column(), controlsColumn -> {
-                                        controlsColumn.layout().spacing(4).fillMaxWidth();
+                                        controlsColumn.layout().spacing(6).fillMaxWidth();
 
-                                        // Section: Basic Inputs
                                         controlsColumn.e(new Label(
                                                 Component.literal("Basic Inputs"),
                                                 0x404040,
@@ -122,25 +221,19 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                         controlsColumn.e(new Divider(0xFF808080, 1),
                                                 div -> div.layout().fillMaxWidth().fixedHeight(1));
 
-                                        // Text input with hint
                                         controlsColumn.e(new TextInput(), input -> {
                                             input.layout().fillMaxWidth().fixedHeight(20);
                                             input.getElement().setHint(Component.literal("Enter item name..."));
                                         });
 
-                                        // Number input
                                         controlsColumn.e(new NumberInput(50), numberInput -> {
                                             numberInput.layout().fillMaxWidth().fixedHeight(20);
                                             numberInput.getElement().setRange(0, 100);
-                                            numberInput.getElement().setOnValueChanged(val -> {
-                                                System.out.println("Number changed: " + val);
-                                            });
+                                            numberInput.getElement().setOnValueChanged(val -> {});
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: Toggles
                                         controlsColumn.e(new Label(
                                                 Component.literal("Toggles"),
                                                 0x404040,
@@ -150,30 +243,19 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                         controlsColumn.e(new Divider(0xFF808080, 1),
                                                 div -> div.layout().fillMaxWidth().fixedHeight(1));
 
-                                        // Checkbox
                                         controlsColumn.e(new Checkbox(
                                                 Component.literal("Auto-sort items"),
                                                 true
                                         ), checkbox -> {
-                                            checkbox.layout().fillMaxWidth().fixedHeight(20);
-                                            checkbox.getElement().setLabelColor(0x404040);
-                                            checkbox.getElement().setOnCheckedChanged(checked -> {
-                                                System.out.println("Auto-sort: " + checked);
-                                            });
+                                            checkbox.layout().fillMaxWidth().fixedHeight(16);
                                         });
 
-                                        // Toggle switch
                                         controlsColumn.e(new ToggleSwitch(true), toggle -> {
                                             toggle.layout().fixedSize(32, 16);
-                                            toggle.getElement().setOnChanged(on -> {
-                                                System.out.println("Toggle: " + on);
-                                            });
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: Selection
                                         controlsColumn.e(new Label(
                                                 Component.literal("Selection"),
                                                 0x404040,
@@ -183,31 +265,23 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                         controlsColumn.e(new Divider(0xFF808080, 1),
                                                 div -> div.layout().fillMaxWidth().fixedHeight(1));
 
-                                        // Dropdown
                                         controlsColumn.e(new Dropdown<>(
                                                 List.of("Stack", "Single", "Half Stack")
                                         ), dropdown -> {
                                             dropdown.layout().fillMaxWidth().fixedHeight(20);
                                             dropdown.getElement().setSelected("Stack");
-                                            dropdown.getElement().setOnSelectionChanged(selected -> {
-                                                System.out.println("Transfer mode: " + selected);
-                                            });
                                         });
 
-                                        // Radio button group
                                         controlsColumn.e(new RadioButtonGroup(), radioGroup -> {
                                             radioGroup.layout().fillMaxWidth();
-                                            radioGroup.getElement().setLabelColor(0x404040);
                                             radioGroup.getElement().addOption("Public");
                                             radioGroup.getElement().addOption("Private");
                                             radioGroup.getElement().addOption("Friends Only");
                                             radioGroup.getElement().setSelectedIndex(0);
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: Sliders & Progress
                                         controlsColumn.e(new Label(
                                                 Component.literal("Sliders & Progress"),
                                                 0x404040,
@@ -217,28 +291,22 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                         controlsColumn.e(new Divider(0xFF808080, 1),
                                                 div -> div.layout().fillMaxWidth().fixedHeight(1));
 
-                                        // Slider
                                         controlsColumn.e(new Slider(0, 100, 1), slider -> {
                                             slider.layout().fillMaxWidth().fixedHeight(20);
                                             slider.getElement().setValue(75);
                                             slider.getElement().setShowValue(true);
                                             slider.getElement().setFormatter(v -> String.format("%.0f%%", v));
-                                            slider.getElement().setOnValueChanged(val -> {
-                                                System.out.println("Slider: " + val);
-                                            });
                                         });
 
-                                        // Progress bar
                                         controlsColumn.e(new ProgressBar(), progress -> {
                                             progress.layout().fillMaxWidth().fixedHeight(12);
                                             progress.getElement().setProgress(65, 100);
                                             progress.getElement().setShowPercentage(true);
+                                            progress.getElement().setFillColor(0xFF4CAF50);
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: Actions
                                         controlsColumn.e(new Label(
                                                 Component.literal("Actions"),
                                                 0x404040,
@@ -248,7 +316,6 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                         controlsColumn.e(new Divider(0xFF808080, 1),
                                                 div -> div.layout().fillMaxWidth().fixedHeight(1));
 
-                                        // Button row
                                         controlsColumn.e(new Row(), buttonRow -> {
                                             buttonRow.layout().spacing(4).fillMaxWidth();
 
@@ -257,18 +324,12 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                                 sortBtn.fillSlot(Button.CONTENT_SLOT, btnContent -> {
                                                     btnContent.e(new Label(Component.literal("Sort")));
                                                 });
-                                                sortBtn.getElement().addPressListener((x, y) -> {
-                                                    System.out.println("Sort button pressed");
-                                                });
                                             });
 
                                             buttonRow.e(new Button(), dumpBtn -> {
                                                 dumpBtn.layout().fixedHeight(20).weight(1);
                                                 dumpBtn.fillSlot(Button.CONTENT_SLOT, btnContent -> {
                                                     btnContent.e(new Label(Component.literal("Dump")));
-                                                });
-                                                dumpBtn.getElement().addPressListener((x, y) -> {
-                                                    System.out.println("Dump button pressed");
                                                 });
                                             });
 
@@ -277,16 +338,11 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                                 clearBtn.fillSlot(Button.CONTENT_SLOT, btnContent -> {
                                                     btnContent.e(new Label(Component.literal("Clear")));
                                                 });
-                                                clearBtn.getElement().addPressListener((x, y) -> {
-                                                    System.out.println("Clear button pressed");
-                                                });
                                             });
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: Text Area
                                         controlsColumn.e(new Label(
                                                 Component.literal("Notes"),
                                                 0x404040,
@@ -302,10 +358,8 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                             textArea.getElement().setMaxLength(200);
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: Tabs Demo
                                         controlsColumn.e(new Label(
                                                 Component.literal("Tabs"),
                                                 0x404040,
@@ -335,11 +389,11 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                                 tabScope.e(new Checkbox(
                                                         Component.literal("Lock crate"),
                                                         false
-                                                ), checkbox -> checkbox.getElement().setLabelColor(0x404040));
+                                                ));
                                                 tabScope.e(new Checkbox(
                                                         Component.literal("Show name"),
                                                         true
-                                                ), checkbox -> checkbox.getElement().setLabelColor(0x404040));
+                                                ));
                                             });
 
                                             tabs.getElement().addTab("History", tabScope -> {
@@ -351,10 +405,8 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                             });
                                         });
 
-                                        // Spacer
                                         controlsColumn.e(new Spacer(0, 8));
 
-                                        // Section: List View
                                         controlsColumn.e(new Label(
                                                 Component.literal("Recent Items"),
                                                 0x404040,
@@ -372,9 +424,6 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                                                     "Oak Log x32",
                                                     "Redstone x48"
                                             ));
-                                            listView.getElement().setOnSelectionChanged(item -> {
-                                                System.out.println("Selected: " + item);
-                                            });
                                         });
                                     });
                                 });
@@ -384,5 +433,53 @@ public class CrateUI extends ComposedUIContainer<CrateMenu> {
                 });
             });
         });
+
+        return tree;
+    }
+
+    /**
+     * Measures, places, and renders the tree to a BufferedImage and saves it as a PNG.
+     */
+    private void renderAndSave(UITree tree, int width, int height, String filename) {
+        renderAndSave(tree, width, height, filename, false);
+    }
+
+    private void renderAndSave(UITree tree, int width, int height, String filename, boolean drawDebugGrid) {
+        var constraints = new Constraints(0, width, 0, height);
+        tree.measureTree(constraints);
+        tree.placeTree(new Position(0, 0), constraints);
+
+        BufferedImageScreenContext ctx = new BufferedImageScreenContext(width, height);
+
+        ctx.drawGradientRect(0, 0, width, height, 0xFFC6C6C6, 0xFFC6C6C6);
+
+        tree.renderTree(ctx);
+
+        if (drawDebugGrid) {
+            ctx.drawDebugGrid();
+        }
+
+        String outputPath = OUTPUT_DIR + "/" + filename + ".png";
+        java.io.File outputDir = new java.io.File(OUTPUT_DIR);
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
+        ctx.saveTo(outputPath);
+    }
+
+    /**
+     * Recursively dumps the tree structure with indentation and bounds info.
+     */
+    private void dumpTree(ITreeNode node, int depth, StringBuilder sb) {
+        String indent = "  ".repeat(depth);
+        Bounds bounds = node.getElement().getBounds();
+        String elementName = node.getElement().getClass().getSimpleName();
+        String boundsStr = bounds != null
+                ? String.format("(%d, %d, %d, %d)", bounds.x(), bounds.y(), bounds.width(), bounds.height())
+                : "(no bounds)";
+        sb.append(indent).append(elementName).append(" ").append(boundsStr).append("\n");
+        for (ITreeNode child : node.getChildren()) {
+            dumpTree(child, depth + 1, sb);
+        }
     }
 }

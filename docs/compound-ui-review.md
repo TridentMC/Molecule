@@ -97,3 +97,58 @@ Both inputs support `setCursorAnimation(600, Easing.EASE_IN_OUT)`; the interval 
 Live cursor checks: typed into the single-line field, selected all text, switched the gallery to Ease in/out, typed two lines, and selected both lines. Carets appeared beside the text, selection rectangles followed each line, and eased opacity included an intermediate gray phase. Tabs now let Button play the sole click sound; the duplicate sound in selectTab was removed. Unselected labels use vanilla's lower baseline, while selected labels keep the normal baseline. ScrollArea reserves a four-pixel gutter before its scrollbar.
 
 Final rebuild: inspected the expanded scrollbar gutter and switched Controls to Lists; selected and unselected tab labels follow their distinct vanilla offsets. Client stopped through Gradle. Sound duplication was verified from the playback paths, not an audio capture.
+
+## Adversarial follow-up
+
+Three sub-agents reviewed and cross-checked the fixes. Confirmed defects repaired:
+
+- Accordion and Tabs rebuild only their content when selection changes, preserving header focus.
+- CycleButton preserves explicitly supplied content.
+- TextArea reveals the focused caret after resizing and selected-text deletion. Ordinary layout passes preserve wheel scrolling. Reducing its maximum length enforces the limit even when a filter rejects the truncated value, preventing a later insertion exception.
+- Container slots update from the live tree after layout and before rendering. Transient previews reset each frame. Quick-craft uses vanilla's count calculation and stack limit; a single drag target no longer aborts other slot updates.
+- Native container initialization restores item interaction handlers. Composed backgrounds protect carried items from accidental outside-click dropping, with a custom-background hook and vanilla bounds fallback.
+
+Shared invalidation helpers replace repeated attachment checks. Redundant implementation comments and long text-input examples were removed. The final maintainability pass found no further actionable issues in these changes.
+
+The final client compiled and ran at 1440 x 900. Live checks covered repeated Enter activation of the accordion, Tab/Enter navigation between headers, custom cycle-button labels, long-note narrowing and widening with the caret visible, deliberate wheel scrolling, inventory pickup, clicking empty panel background while carrying an item, drag placement, and the native item tooltip. The client was stopped through Gradle.
+
+Evidence: [text reflow](D:/Modding/Minecraft/Molecule/run/screenshots/2026-09-27_02.24.07.png) and [inventory tooltip](D:/Modding/Minecraft/Molecule/run/screenshots/2026-09-27_02.25.45.png). Creative clone previews, maximum-count overlays, dynamic inventory remounting, and the maximum-length/filter combination were checked in source; those cases were not individually reproduced in the game. No automated test suite or performance benchmark was run.
+
+## Scrollbar styles and documentation cleanup
+
+ScrollArea now offers LIST and CREATIVE styles. LIST uses vanilla's six-pixel proportional scrollbar. CREATIVE uses the native 12-by-15 enabled and disabled thumbs inside a 14-pixel recessed track, with colours matched to the creative inventory texture. Both reserve a four-pixel content gutter and compose existing surfaces and sprites. Horizontal scrolling adapts the same styles.
+
+The gallery's Scrollbars tab was checked at 1440 x 900: vertical dragging reached the last row in both styles, wheel scrolling moved the creative viewport, and both horizontal thumbs reached the end of their content. The list scrollbar disappeared when content fit; the creative thumb remained visibly disabled and ignored dragging. A cross-review caught and fixed the creative track's descendant sizing before this pass. [Scrollbar comparison](D:/Modding/Minecraft/Molecule/run/screenshots/2026-09-27_02.37.11.png). Production compilation passed and the client was stopped through Gradle.
+
+Removed 28 superseded widget proposals, implementation plans, and old composition examples. Current API references, project guidance, and these validation notes remain. The composition API reference now documents scrollbar style selection.
+
+Follow-up: renamed CREATIVE to GRIPPY to describe its appearance. The horizontal thumb had been stretched from 12 by 15 to 15 by 12; it now retains its native 12-by-15 dimensions, with a 17-pixel-high horizontal track. Rebuilt and visually verified the corrected proportions beside the vertical thumb in the enlarged gallery.
+
+## Progress rendering
+
+Compared the 26.1.2 vanilla sources for BossHealthOverlay, AbstractFurnaceScreen, and LoadingOverlay. Boss and furnace progress crop textures; the loading screen draws a one-pixel outline and inset solid fill. Compound had squeezed a complete boss-bar texture into the changing fill width. Its general-purpose ProgressBar now uses the loading-screen treatment, composed from Surface and Rect, retaining configurable colours, labels, and the existing indeterminate animation.
+
+This also exposed a Surface bug: a solid backing rectangle used as a border showed through transparent backgrounds. Borders now consist of four non-overlapping edges. In-game validation at 1440 x 900 confirmed the transparent interior, advancing progress from 65% to 70%, and the animated sweep clipping within its inset. [Progress bars](D:/Modding/Minecraft/Molecule/run/screenshots/2026-09-27_02.51.24.png). Production compilation passed; the client was stopped through Gradle.
+
+## Whole-stack repair and Minecraft 26.3 validation
+
+Updated to Minecraft 26.3, NeoForge 26.3.0.23-beta, and ModDevGradle 2.0.147. The new SDL input constants, screen/HUD access, cursors, native tooltip/render extraction, and container previews are adapted. The 19 audit findings and architecture changes are recorded in [compound-ui-audit.md](compound-ui-audit.md).
+
+Ran the client at 1440×900. Windows capture returned a black SDL client area; Minecraft's F2 screenshots showed the actual rendering. Checks confirmed:
+
+- Bound container revision 0→1→2 hides/restores conditional children while the active animation count stays at 2.
+- Mounted checkbox label placement, radio removal, progress maximum, divider thickness/colour, and solid toggle thumb update immediately.
+- Centered text hit-testing inserts between the clicked characters; supplementary Unicode input/deletion preserves the surrounding text; replacing scrolled text with a short value keeps it visible.
+- Horizontal grippy dragging reaches the content end without squashing its native 12×15 thumb. F3+T reload preserves widget/scrollbar textures. Tree expansion/collapse also works.
+- The composed crate opens on 26.3, shows native item tooltips, picks up and places stacks, and keeps carried items on panel-background clicks. The same automated drag gives endpoint-only placement in Compound and vanilla; intermediate previews were source-reviewed.
+
+Evidence: [Unicode input](../run/screenshots/2026-09-27_04.05.57.png), [resource reload](../run/screenshots/2026-09-27_04.07.51.png), [inventory tooltip](../run/screenshots/2026-09-27_04.12.36.png), and [carried stack on panel](../run/screenshots/2026-09-27_04.13.30.png). The original demo world was preserved; validation used an upgraded copy. Its vanilla upgrade emitted village-structure conversion diagnostics, and Windows performance-counter diagnostics appeared at startup. No claim of a clean vanilla-world migration is made.
+
+The client was stopped through Gradle. No branch was published and no PR was opened.
+Existing checks: five Compound tests and four demo harness tests pass. Updated stale layout assertions to check authored content, gutter and clipping; repaired the existing headless harness runtime and font collision. The Java2D images are diagnostic approximations, not visual evidence of vanilla appearance. Rechecked 26.3 LoadingOverlay: the one-pixel outline and inset solid fill remain native behavior.
+
+## Second review pass — 2026-09-27
+
+Additional component/core/standards reviews and cross-reviews repaired lifecycle, layout arithmetic, scroll propagation, popup sizing, editing and native input/tooltip issues. Details and API migration notes are in [the audit](compound-ui-audit.md#second-adversarial-pass).
+
+Live checks at 1440×900 confirmed fixed modal footer positioning during scrolling, selected-option visibility on opening a dropdown, horizontal wheel movement with the native-sized grippy thumb, and multiline paste/wrapping. Other editing edge cases remain explicitly source-reviewed. The client was stopped through Gradle; nothing was published.

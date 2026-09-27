@@ -16,6 +16,7 @@ import com.tridevmc.compound.ui.element.NumberInput;
 import com.tridevmc.compound.ui.element.Panel;
 import com.tridevmc.compound.ui.element.ProgressBar;
 import com.tridevmc.compound.ui.element.RadioButtonGroup;
+import com.tridevmc.compound.ui.element.Row;
 import com.tridevmc.compound.ui.element.ScrollArea;
 import com.tridevmc.compound.ui.element.Slider;
 import com.tridevmc.compound.ui.element.Stack;
@@ -27,10 +28,13 @@ import com.tridevmc.compound.ui.element.ToggleSwitch;
 import com.tridevmc.compound.ui.element.TreeView;
 import com.tridevmc.compound.ui.layout.Alignment;
 import com.tridevmc.compound.ui.scope.ICompositionScope;
-import com.tridevmc.compound.ui.scope.RootScope;
+
 import com.tridevmc.compound.ui.screen.ComposedUI;
+import com.tridevmc.compound.ui.state.State;
+import com.tridevmc.compound.ui.state.StateImpl;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -46,6 +50,7 @@ public class UIGallery extends ComposedUI {
     private final NumberInput quantity = new NumberInput(50);
     private final Slider volume = new Slider(0, 100, 1);
     private final TextArea notes = new TextArea();
+    private final State<Boolean> narrowNotes = new StateImpl<>(false);
     private final CycleButton<TextArea.CursorAnimationMode> cursorStyle = new CycleButton<>(
             Component.literal("Cursor"), List.of(TextArea.CursorAnimationMode.values()),
             mode -> Component.literal(mode == TextArea.CursorAnimationMode.INSTANT ? "Blink" : "Ease in/out"));
@@ -62,8 +67,10 @@ public class UIGallery extends ComposedUI {
     private final Dropdown<String> destinations = new Dropdown<>(IntStream.rangeClosed(1, 40)
             .mapToObj(index -> "Destination " + index).toList());
     private final Modal dialog = new Modal(Component.literal("Confirm action"),
-            Component.literal("Controls behind this dialog should be blocked."));
+            Component.literal("Controls behind this dialog should be blocked. "
+                    + "This deliberately long message must scroll while the action buttons stay visible. ".repeat(12)));
     private int clicks;
+    private final UIRegressionGallery checks = new UIRegressionGallery();
 
     public UIGallery(Screen previousScreen) {
         this.previousScreen = previousScreen;
@@ -71,6 +78,8 @@ public class UIGallery extends ComposedUI {
         this.tabs.addTab("Lists", this::lists);
         this.tabs.addTab("Text", this::text);
         this.tabs.addTab("More", this::more);
+        this.tabs.addTab("Scrollbars", this::scrollbars);
+        this.tabs.addTab("Checks", this.checks::compose);
         this.entries.setItems(IntStream.rangeClosed(1, 100)
                 .mapToObj(index -> "Storage entry " + index).toList());
         this.access.setSelected("Public");
@@ -81,6 +90,7 @@ public class UIGallery extends ComposedUI {
         this.volume.setShowValue(true);
         this.volume.setFormatter(value -> "Volume: " + Math.round(value) + "%");
         this.notes.setHint(Component.literal("Write a note..."));
+        this.notes.setMaxLength(4000);
         this.cursorStyle.setOnValueChanged(mode -> {
             Easing easing = mode == TextArea.CursorAnimationMode.INSTANT ? Easing.STEP : Easing.EASE_IN_OUT;
             this.name.setCursorAnimation(600, easing);
@@ -105,7 +115,7 @@ public class UIGallery extends ComposedUI {
         this.progress.setShowPercentage(true);
         this.loading.setIndeterminate(true);
         this.loading.setLabel(Component.literal("Loading..."));
-        this.destinations.setSelected("Destination 1");
+        this.destinations.setSelected("Destination 30");
         var building = this.storageTree.getRoot().addChild("Building materials");
         building.addChild("Stone");
         building.addChild("Wood", wood -> {
@@ -119,7 +129,7 @@ public class UIGallery extends ComposedUI {
     }
 
     @Override
-    protected void compose(RootScope scope) {
+    protected void compose(ICompositionScope scope) {
         scope.e(new Stack(), root -> {
             root.layout().fillMax().contentAlignment(Alignment.CENTER);
             root.e(new Panel(), panel -> {
@@ -193,10 +203,25 @@ public class UIGallery extends ComposedUI {
     private void text(ICompositionScope scope) {
         scope.e(new Column(), column -> {
             column.layout().fillMax().spacing(6);
-            column.e(this.cursorStyle, control -> control.layout().fillMaxWidth().fixedHeight(20));
-            column.e(new Label(Component.literal("Type, select, copy/paste, and scroll long notes."),
+            column.onKeyPress(event -> {
+                if (event.keyCode() != InputConstants.KEY_F6) return false;
+                this.narrowNotes.set(!this.narrowNotes.get());
+                return true;
+            });
+            column.e(this.cursorStyle, control -> {
+                control.layout().fillMaxWidth().fixedHeight(20);
+                control.fillSlot(Button.CONTENT_SLOT, content -> content.e(new Label(
+                        () -> Component.literal(this.cursorStyle.getValue() == TextArea.CursorAnimationMode.INSTANT
+                                ? "Caret animation: Blink" : "Caret animation: Ease in/out"), () -> 0xFFFFFF)));
+            });
+            column.e(new Label(Component.literal("F6: resize notes | Type, select, paste, and scroll."),
                     0x404040, false));
-            column.e(this.notes, area -> area.layout().fillMaxWidth().weight(1));
+            column.e(this.notes, area -> {
+                area.layout().fillMaxWidth().weight(1).deferred(layout -> {
+                    layout.bind(this.narrowNotes);
+                    layout.layout().maxWidth(this.narrowNotes.get() ? 190 : 440);
+                });
+            });
         });
     }
 
@@ -224,6 +249,41 @@ public class UIGallery extends ComposedUI {
         });
     }
 
+    private void scrollbars(ICompositionScope scope) {
+        scope.e(new Row(), row -> {
+            row.layout().fillMax().spacing(12);
+            this.scrollbarSample(row, "Selection list", ScrollArea.ScrollbarStyle.LIST);
+            this.scrollbarSample(row, "Grippy", ScrollArea.ScrollbarStyle.GRIPPY);
+        });
+    }
+
+    private void scrollbarSample(ICompositionScope scope, String title, ScrollArea.ScrollbarStyle style) {
+        scope.e(new Column(), column -> {
+            column.layout().weight(1).fillMaxHeight().spacing(6);
+            column.e(new Label(Component.literal(title), 0x404040, false));
+            column.e(new ScrollArea().scrollbarStyle(style), scroll -> {
+                scroll.layout().fillMaxWidth().weight(1);
+                scroll.fillSlot(ScrollArea.CONTENT_SLOT, content -> content.e(new Column(), entries -> {
+                    entries.layout().fillMaxWidth().spacing(4);
+                    for (int index = 1; index <= 40; index++) {
+                        entries.e(new Label(Component.literal("Entry " + index), 0x404040, false));
+                    }
+                }));
+            });
+            column.e(new Label(Component.literal("No overflow"), 0x404040, false));
+            column.e(new ScrollArea().scrollbarStyle(style), scroll -> {
+                scroll.layout().fillMaxWidth().fixedHeight(24);
+                scroll.fillSlot(ScrollArea.CONTENT_SLOT,
+                        content -> content.e(new Label(Component.literal("All items fit"), 0x404040, false)));
+            });
+            column.e(new ScrollArea(ScrollArea.Direction.HORIZONTAL).scrollbarStyle(style), scroll -> {
+                scroll.layout().fillMaxWidth().fixedHeight(34);
+                scroll.fillSlot(ScrollArea.CONTENT_SLOT, content -> content.e(new Label(
+                        Component.literal("Horizontal content: beginning, middle, and end."), 0x404040, false)));
+            });
+        });
+    }
+
     private void button(ICompositionScope scope, String label, Runnable action) {
         scope.e(new Button(), button -> {
             button.layout().fillMaxWidth().fixedHeight(20);
@@ -234,6 +294,6 @@ public class UIGallery extends ComposedUI {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.previousScreen);
+        this.minecraft.gui.setScreen(this.previousScreen);
     }
 }

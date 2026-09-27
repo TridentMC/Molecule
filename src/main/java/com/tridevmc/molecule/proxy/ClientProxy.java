@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public class ClientProxy extends CommonProxy {
 
@@ -16,13 +16,13 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void onKey(InputEvent.Key event) {
-        if (event.getKey() != GLFW.GLFW_KEY_F8 || event.getAction() != GLFW.GLFW_PRESS) {
+        if (event.getKey() != InputConstants.KEY_F8 || event.getAction() != InputConstants.PRESS) {
             return;
         }
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            if (!(minecraft.screen instanceof UIGallery)) {
-                minecraft.setScreen(new UIGallery(minecraft.screen));
+            if (!(minecraft.gui.screen() instanceof UIGallery)) {
+                minecraft.gui.setScreen(new UIGallery(minecraft.gui.screen()));
             }
         });
     }
