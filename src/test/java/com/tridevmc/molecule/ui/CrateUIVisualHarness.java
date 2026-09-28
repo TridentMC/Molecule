@@ -1,12 +1,12 @@
 package com.tridevmc.molecule.ui;
 
+import com.tridevmc.compound.ui.scope.ICompositionScope;
 import com.tridevmc.compound.test.MinecraftMockExtension;
 import com.tridevmc.compound.ui.element.*;
 import com.tridevmc.compound.ui.layout.Alignment;
 import com.tridevmc.compound.ui.layout.Bounds;
 import com.tridevmc.compound.ui.layout.Constraints;
 import com.tridevmc.compound.ui.layout.Position;
-import com.tridevmc.compound.ui.scope.RootScope;
 import com.tridevmc.compound.ui.tree.ITreeNode;
 import com.tridevmc.compound.ui.tree.UITree;
 import com.tridevmc.compound.ui.visual.BufferedImageScreenContext;
@@ -133,7 +133,7 @@ public class CrateUIVisualHarness {
      */
     private UITree composeCrateUI(List<Slot> slots) {
         UITree tree = new UITree();
-        RootScope scope = new RootScope(tree);
+        var scope = ICompositionScope.root(tree);
 
         scope.e(new Stack(), stack -> {
             stack.layout()
