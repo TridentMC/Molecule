@@ -9,14 +9,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraft.world.Container;
 
 
 public class CrateMenu extends CompoundContainerMenu {
 
     private final CrateBlockEntity crate;
-    private final IItemHandler inventory;
+    private final Container inventory;
 
     public CrateMenu(int window, Inventory playerInv, BlockEntity tile) {
         super(MoleculeContent.CRATE_MENU, window);
@@ -26,7 +25,7 @@ public class CrateMenu extends CompoundContainerMenu {
         // Actual inventory
         for (int k = 0; k < 3; ++k) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new SlotItemHandler(this.inventory, l + k * 9, this.slots.size(), 0));
+                this.addSlot(new Slot(this.inventory, l + k * 9, this.slots.size(), 0));
             }
         }
 
@@ -65,11 +64,11 @@ public class CrateMenu extends CompoundContainerMenu {
         if (slot.hasItem()) {
             ItemStack stackSlot = slot.getItem();
             out = stackSlot.copy();
-            if (index < this.inventory.getSlots()) {
-                if (!this.moveItemStackTo(stackSlot, this.inventory.getSlots(), this.slots.size(), true)) {
+            if (index < this.inventory.getContainerSize()) {
+                if (!this.moveItemStackTo(stackSlot, this.inventory.getContainerSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(stackSlot, 0, this.inventory.getSlots(), false)) {
+            } else if (!this.moveItemStackTo(stackSlot, 0, this.inventory.getContainerSize(), false)) {
                 return ItemStack.EMPTY;
             }
 

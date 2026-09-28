@@ -6,11 +6,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.SimpleContainer;
 
 public class CrateBlockEntity extends BlockEntity {
 
-    public ItemStackHandler inventory = new ItemStackHandler(27);
+    public final SimpleContainer inventory = new SimpleContainer(27) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            CrateBlockEntity.this.setChanged();
+        }
+    };
 
     public CrateBlockEntity(BlockPos pos, BlockState state) {
         super(MoleculeContent.CRATE_TILE, pos, state);
@@ -19,13 +26,13 @@ public class CrateBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        input.child("inv").ifPresent(inventoryInput -> this.inventory.deserialize(inventoryInput));
+        input.child("inv").ifPresent(inventoryInput -> ContainerHelper.loadAllItems(inventoryInput, this.inventory.getItems()));
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        this.inventory.serialize(output.child("inv"));
+        ContainerHelper.saveAllItems(output.child("inv"), this.inventory.getItems());
     }
 
 }
