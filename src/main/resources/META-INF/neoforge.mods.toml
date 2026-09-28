@@ -8,3 +8,16 @@ displayName = "Molecule"
 description = '''
 Molecule is the test mod used for the development of Trident Compound.
 '''
+[[dependencies.molecule]]
+modId = "minecraft"
+type = "required"
+versionRange = "[26.3,26.4)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.molecule]]
+modId = "neoforge"
+type = "required"
+versionRange = "[26.3.0.26-beta,26.4)"
+ordering = "NONE"
+side = "BOTH"
