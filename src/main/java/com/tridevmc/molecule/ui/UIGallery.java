@@ -31,7 +31,6 @@ import com.tridevmc.compound.ui.scope.ICompositionScope;
 
 import com.tridevmc.compound.ui.screen.ComposedUI;
 import com.tridevmc.compound.ui.state.State;
-import com.tridevmc.compound.ui.state.StateImpl;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -50,7 +49,7 @@ public class UIGallery extends ComposedUI {
     private final NumberInput quantity = new NumberInput(50);
     private final Slider volume = new Slider(0, 100, 1);
     private final TextArea notes = new TextArea();
-    private final State<Boolean> narrowNotes = new StateImpl<>(false);
+    private final State<Boolean> narrowNotes = State.of(false);
     private final CycleButton<TextArea.CursorAnimationMode> cursorStyle = new CycleButton<>(
             Component.literal("Cursor"), List.of(TextArea.CursorAnimationMode.values()),
             mode -> Component.literal(mode == TextArea.CursorAnimationMode.INSTANT ? "Blink" : "Ease in/out"));
