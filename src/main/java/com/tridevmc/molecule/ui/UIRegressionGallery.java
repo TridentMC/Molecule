@@ -1,7 +1,7 @@
 package com.tridevmc.molecule.ui;
 
 import com.tridevmc.compound.ui.animation.Easing;
-import com.tridevmc.compound.ui.element.BaseElement;
+import com.tridevmc.compound.ui.element.Element;
 import com.tridevmc.compound.ui.layout.Bounds;
 import com.tridevmc.compound.ui.layout.Constraints;
 import com.tridevmc.compound.ui.layout.LayoutProperties;
@@ -98,7 +98,7 @@ final class UIRegressionGallery {
         });
     }
 
-    private class Pulse extends BaseElement implements IComposableElement {
+    private class Pulse extends Element implements IComposableElement {
         @Override
         public Size measure(Constraints constraints, LayoutProperties properties, List<Size> children) {
             return new Size(constraints.maxWidth(), 6);

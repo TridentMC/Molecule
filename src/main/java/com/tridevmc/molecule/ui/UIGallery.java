@@ -2,6 +2,8 @@ package com.tridevmc.molecule.ui;
 
 import com.tridevmc.compound.ui.element.Accordion;
 import com.tridevmc.compound.ui.animation.Easing;
+import com.tridevmc.compound.ui.debug.DebugOverlayConfig;
+import net.minecraft.client.input.KeyEvent;
 import com.tridevmc.compound.ui.element.Box;
 import com.tridevmc.compound.ui.element.Button;
 import com.tridevmc.compound.ui.element.Checkbox;
@@ -128,6 +130,15 @@ public class UIGallery extends ComposedUI {
     }
 
     @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (event.key() == InputConstants.KEY_F7) {
+            DebugOverlayConfig.get().toggle();
+            return true;
+        }
+        return super.keyPressed(event);
+    }
+
+    @Override
     protected void compose(ICompositionScope scope) {
         scope.e(new Stack(), root -> {
             root.layout().fillMax().contentAlignment(Alignment.CENTER);
@@ -139,7 +150,7 @@ public class UIGallery extends ComposedUI {
                     padding.e(new Column(), column -> {
                         column.layout().fillMax().spacing(6);
                         column.e(new Label(Component.literal("Compound UI Gallery"), 0x404040, false));
-                        column.e(new Label(Component.literal("Tab: focus | Enter: activate | Wheel: scroll"),
+                        column.e(new Label(Component.literal("Tab: focus | Enter: activate | Wheel: scroll | F7: layout"),
                                 0x404040, false));
                         column.e(this.tabs, tabScope -> tabScope.layout().fillMaxWidth().weight(1));
                         this.button(column, "Done", this::onClose);
