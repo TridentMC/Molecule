@@ -194,7 +194,7 @@ public class UIGallery extends ComposedUI {
                     target.layout().fillMaxWidth().fixedHeight(20);
                     target.e(new Label(Component.literal("Right-click here for actions"), 0x404040, false));
                     target.onClick(event -> {
-                        if (event.button() != 1) return false;
+                        if (event.button() != InputConstants.MOUSE_BUTTON_RIGHT) return false;
                         this.contextMenu.show(event.x(), event.y());
                         return true;
                     });
