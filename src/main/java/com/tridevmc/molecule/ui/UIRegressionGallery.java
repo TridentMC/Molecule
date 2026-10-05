@@ -2,12 +2,6 @@ package com.tridevmc.molecule.ui;
 
 import com.tridevmc.compound.ui.animation.Easing;
 import com.tridevmc.compound.ui.element.Element;
-import com.tridevmc.compound.ui.layout.Bounds;
-import com.tridevmc.compound.ui.layout.Constraints;
-import com.tridevmc.compound.ui.layout.LayoutProperties;
-import com.tridevmc.compound.ui.layout.Size;
-import java.util.List;
-import com.tridevmc.compound.ui.element.Button;
 import com.tridevmc.compound.ui.element.Checkbox;
 import com.tridevmc.compound.ui.element.Column;
 import com.tridevmc.compound.ui.element.Divider;
@@ -19,11 +13,18 @@ import com.tridevmc.compound.ui.element.Rect;
 import com.tridevmc.compound.ui.element.ScrollArea;
 import com.tridevmc.compound.ui.element.TextInput;
 import com.tridevmc.compound.ui.element.ToggleSwitch;
+import com.tridevmc.compound.ui.layout.Bounds;
+import com.tridevmc.compound.ui.layout.Constraints;
+import com.tridevmc.compound.ui.layout.LayoutProperties;
+import com.tridevmc.compound.ui.layout.Size;
 import com.tridevmc.compound.ui.scope.ICompositionScope;
 import com.tridevmc.compound.ui.state.State;
 import net.minecraft.network.chat.Component;
 
-final class UIRegressionGallery {
+import java.util.List;
+
+final class UIRegressionGallery extends GalleryModule {
+    private final ScrollArea scroll = new ScrollArea();
     private final State<Integer> revision = State.of(0);
     private final Checkbox checkbox = new Checkbox(Component.literal("Original label"));
     private final RadioButtonGroup options = new RadioButtonGroup();
@@ -45,12 +46,13 @@ final class UIRegressionGallery {
         this.toggle.setThumbColor(0xFF00AAFF);
     }
 
-    void compose(ICompositionScope scope) {
-        scope.e(new ScrollArea(), scroll -> {
+    @Override
+    public void compose(ICompositionScope scope) {
+        scope.e(this.scroll, scroll -> {
             scroll.layout().fillMax();
             scroll.fillSlot(ScrollArea.CONTENT_SLOT, content -> content.e(new Column(), column -> {
                 column.layout().fillMaxWidth().spacing(6);
-                this.button(column, "Recompose container", () -> this.revision.update(value -> value + 1));
+                GalleryWidgets.button(column, "Recompose container", () -> this.revision.update(value -> value + 1));
                 column.e(new Column(), bound -> {
                     bound.layout().fillMaxWidth().spacing(4);
                     bound.bindComposition(this.revision);
@@ -62,14 +64,14 @@ final class UIRegressionGallery {
                 column.e(new Pulse(), pulse -> pulse.layout().fillMaxWidth().fixedHeight(6));
                 column.e(new Label(() -> Component.literal("Active animations: "
                         + scope.getTree().getAnimationScheduler().getActiveAnimationCount()), () -> 0x404040, () -> false));
-                this.button(column, "Change mounted widgets", this::changeWidgets);
+                GalleryWidgets.button(column, "Change mounted widgets", this::changeWidgets);
                 column.e(this.checkbox);
                 column.e(this.options);
                 column.e(this.progress, bar -> bar.layout().fillMaxWidth().fixedHeight(14));
                 column.e(this.toggle, control -> control.layout().fixedSize(50, 20));
                 column.e(this.divider, line -> line.layout().fillMaxWidth());
                 column.e(this.text, field -> field.layout().fillMaxWidth().fixedHeight(20));
-                this.button(column, "Long text then short text", () -> {
+                GalleryWidgets.button(column, "Long text then short text", () -> {
                     this.text.setValue("A long value that scrolls the field far beyond the end of the replacement text ".repeat(4));
                     this.text.setValue("ABCDE");
                 });
@@ -88,14 +90,6 @@ final class UIRegressionGallery {
         this.divider.setColor(this.changed ? 0xFF008800 : 0xFF606060);
         this.divider.setThickness(this.changed ? 5 : 3);
         this.toggle.setThumbColor(this.changed ? 0xFFFFAA00 : 0xFF00AAFF);
-    }
-
-    private void button(ICompositionScope scope, String title, Runnable action) {
-        scope.e(new Button(), button -> {
-            button.layout().fillMaxWidth().fixedHeight(20);
-            button.fillSlot(Button.CONTENT_SLOT, body -> body.e(new Label(Component.literal(title))));
-            button.getElement().addPressListener((x, y) -> action.run());
-        });
     }
 
     private class Pulse extends Element implements IComposableElement {

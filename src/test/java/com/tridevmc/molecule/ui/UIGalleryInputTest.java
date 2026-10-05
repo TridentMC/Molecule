@@ -1,7 +1,10 @@
 package com.tridevmc.molecule.ui;
 
 import com.tridevmc.compound.test.MinecraftMockExtension;
+import com.tridevmc.compound.ui.animation.Easing;
+import com.tridevmc.compound.ui.debug.DebugOverlayConfig;
 import com.tridevmc.compound.ui.element.ContextMenu;
+import com.tridevmc.compound.ui.element.CycleButton;
 import com.tridevmc.compound.ui.element.Label;
 import com.tridevmc.compound.ui.element.ScrollArea;
 import com.tridevmc.compound.ui.element.Tabs;
@@ -10,6 +13,7 @@ import com.tridevmc.compound.ui.element.TextInput;
 import com.tridevmc.compound.ui.layout.Constraints;
 import com.tridevmc.compound.ui.layout.Position;
 import com.tridevmc.compound.ui.screen.ComposedUI;
+import com.tridevmc.compound.ui.state.State;
 import com.tridevmc.compound.ui.tree.ITreeNode;
 import com.tridevmc.compound.ui.tree.UITree;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -23,15 +27,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +48,8 @@ import static org.mockito.Mockito.when;
 class UIGalleryInputTest {
     private UIGallery screen;
     private UITree tree;
+    private GalleryActions actions;
+    private List<GalleryModule> modules;
 
     @BeforeEach
     void setUp() throws ReflectiveOperationException {
@@ -51,7 +61,12 @@ class UIGalleryInputTest {
         var keyboardField = Minecraft.class.getDeclaredField("keyboardHandler");
         keyboardField.setAccessible(true);
         keyboardField.set(Minecraft.getInstance(), mock(net.minecraft.client.KeyboardHandler.class));
-        this.screen = new UIGallery(null);
+        this.actions = new GalleryActions();
+        var name = spy(new TextInput());
+        this.modules = List.of(spy(new GalleryControls(this.actions, name)), spy(new GalleryLists()),
+                spy(new GalleryText(name)), spy(new GalleryMore(this.actions)),
+                spy(new GalleryScrollbars()), spy(new UIRegressionGallery()), spy(new GalleryAnimations()));
+        this.screen = new UIGallery(null, this.actions, this.modules);
         this.screen.width = 800;
         this.screen.height = 600;
         var initMethod = ComposedUI.class.getDeclaredMethod("init");
@@ -131,6 +146,170 @@ class UIGalleryInputTest {
         this.screen.mouseClicked(this.click(area, InputConstants.MOUSE_BUTTON_LEFT), false);
         assertTrue(this.screen.keyPressed(this.paste()));
         assertEquals("pasted", ((TextArea) area.getElement()).getValue());
+    }
+
+    @Test
+    void modulesComposeOnlyOnMountAndExplicitInvalidation() {
+        this.assertCompositions(1, 0, 0, 0, 0, 0);
+        for (int frame = 0; frame < 5; frame++) this.layout();
+        this.tree.requestRemeasure(this.modules.getFirst().getNode());
+        this.layout();
+        this.assertCompositions(1, 0, 0, 0, 0, 0);
+        this.selectTab(0);
+        this.assertCompositions(1, 0, 0, 0, 0, 0);
+        this.selectTab(1);
+        this.assertCompositions(1, 1, 0, 0, 0, 0);
+        this.tree.requestRecompose(this.modules.get(1).getNode());
+        this.layout();
+        this.assertCompositions(1, 2, 0, 0, 0, 0);
+        this.selectTab(0);
+        this.assertCompositions(2, 2, 0, 0, 0, 0);
+        for (int index = 2; index < 6; index++) this.selectTab(index);
+        this.assertCompositions(2, 2, 1, 1, 1, 1);
+        for (int frame = 0; frame < 5; frame++) this.layout();
+        this.assertCompositions(2, 2, 1, 1, 1, 1);
+    }
+
+    @Test
+    void widgetChangesAndActionSuppliersDoNotReplayControls() {
+        var input = (TextInput) this.find(node -> node.getElement() instanceof TextInput).getElement();
+        input.setValue("Retained name");
+        this.actions.count();
+        this.actions.dialog.show();
+        this.layout();
+        this.actions.dialog.close();
+        this.layout();
+        var counter = (Label) this.find(node -> node.getElement() instanceof Label label
+                && label.getText().getString().equals("Actions: 1")).getElement();
+        assertEquals("Actions: 1", counter.getText().getString());
+        this.assertCompositions(1, 0, 0, 0, 0, 0);
+        this.selectTab(1);
+        this.selectTab(0);
+        assertSame(input, this.find(node -> node.getElement() instanceof TextInput).getElement());
+        assertEquals("Retained name", input.getValue());
+        assertEquals(1, this.actions.countValue());
+    }
+
+    @Test
+    void notesResizeIsLayoutOnlyAndValuesSurviveRemount() {
+        this.selectTextTab();
+        var node = this.find(candidate -> candidate.getElement() instanceof TextArea);
+        var notes = (TextArea) node.getElement();
+        this.screen.mouseClicked(this.click(node, InputConstants.MOUSE_BUTTON_LEFT), false);
+        notes.setValue("Retained notes");
+        this.layout();
+        int wide = notes.getBounds().width();
+        assertTrue(this.screen.keyPressed(new KeyEvent(InputConstants.KEY_F6, 0, 0)));
+        this.layout();
+        assertTrue(notes.getBounds().width() < wide);
+        this.assertCompositions(1, 0, 1, 0, 0, 0);
+        this.selectTab(0);
+        this.selectTextTab();
+        assertSame(notes, this.find(candidate -> candidate.getElement() instanceof TextArea).getElement());
+        assertEquals("Retained notes", notes.getValue());
+        assertEquals(190, notes.getBounds().width());
+        this.assertCompositions(2, 0, 2, 0, 0, 0);
+    }
+
+    @Test
+    void scrollbarSamplesRetainScrollPositionsAcrossTabs() {
+        this.selectTab(4);
+        var scroll = (ScrollArea) this.find(node -> node.getElement() instanceof ScrollArea).getElement();
+        scroll.scrollTo(0, 70);
+        this.layout();
+        int position = scroll.getScrollYState().get();
+        assertTrue(position > 0);
+        this.selectTab(0);
+        this.selectTab(4);
+        assertSame(scroll, this.find(node -> node.getElement() instanceof ScrollArea).getElement());
+        assertEquals(position, scroll.getScrollYState().get());
+        this.assertCompositions(2, 0, 0, 0, 2, 0);
+    }
+
+    @Test
+    void caretStyleStillUpdatesTheNameOnAnotherTab() {
+        var name = (TextInput) this.find(node -> node.getElement() instanceof TextInput).getElement();
+        this.selectTextTab();
+        var cursor = (CycleButton<?>) this.find(node -> node.getElement() instanceof CycleButton).getElement();
+        @SuppressWarnings("unchecked")
+        var styles = (CycleButton<TextArea.CursorAnimationMode>) cursor;
+        styles.setValue(TextArea.CursorAnimationMode.FADE);
+        this.layout();
+        verify(name).setCursorAnimation(600, Easing.EASE_IN_OUT);
+        this.assertCompositions(1, 0, 1, 0, 0, 0);
+        this.selectTab(0);
+        this.selectTextTab();
+        styles.setValue(TextArea.CursorAnimationMode.INSTANT);
+        this.layout();
+        verify(name).setCursorAnimation(600, Easing.STEP);
+        this.assertCompositions(2, 0, 2, 0, 0, 0);
+    }
+
+    @Test
+    void animationTabIsAppendedAndRetainsItsModelAcrossSwitching() {
+        var tabs = (Tabs) this.find(node -> node.getElement() instanceof Tabs).getElement();
+        assertEquals(7, tabs.getTabCount());
+        this.selectTab(6);
+        var module = (GalleryAnimations) this.modules.get(6);
+        assertTrue(this.tree.hasNode(module.canvas));
+        module.model.timeline.pause();
+        module.model.palette.immediate(0xFF123456);
+        this.selectTab(0);
+        assertFalse(this.tree.hasNode(module.canvas));
+        this.selectTab(6);
+        assertTrue(this.tree.hasNode(module.canvas));
+        assertTrue(module.model.timeline.isPaused());
+        assertEquals(0xFF123456, module.model.palette.value());
+        this.assertCompositions(2, 0, 0, 0, 0, 0, 2);
+    }
+
+    @Test
+    void debugShortcutDoesNotRecomposeModules() {
+        var config = DebugOverlayConfig.get();
+        boolean enabled = config.isEnabled();
+        try {
+            assertTrue(this.screen.keyPressed(new KeyEvent(InputConstants.KEY_F7, 0, 0)));
+            assertEquals(!enabled, config.isEnabled());
+            this.layout();
+            this.assertCompositions(1, 0, 0, 0, 0, 0);
+        } finally {
+            config.setEnabled(enabled);
+        }
+    }
+
+    @Test
+    void regressionStructuralChangesStayInsideTheirReplayNodes() throws ReflectiveOperationException {
+        this.selectTab(5);
+        var field = UIRegressionGallery.class.getDeclaredField("revision");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        var state = (State<Integer>) field.get(this.modules.get(5));
+        for (int revision = 1; revision <= 2; revision++) {
+            state.update(value -> value + 1);
+            this.layout();
+            var expected = "Container revision: " + revision;
+            assertTrue(this.find(node -> node.getElement() instanceof Label label
+                    && label.getText().getString().equals(expected)) != null);
+            this.assertCompositions(1, 0, 0, 0, 0, 1);
+        }
+        this.selectTab(0);
+        this.selectTab(5);
+        state.update(value -> value + 1);
+        this.layout();
+        assertTrue(this.find(node -> node.getElement() instanceof Label label
+                && label.getText().getString().equals("Container revision: 3")) != null);
+        this.assertCompositions(2, 0, 0, 0, 0, 2);
+    }
+
+    private void assertCompositions(int... counts) {
+        for (int index = 0; index < counts.length; index++) {
+            verify(this.modules.get(index), times(counts[index])).compose(any());
+        }
+    }
+
+    private void selectTab(int index) {
+        ((Tabs) this.find(node -> node.getElement() instanceof Tabs).getElement()).setSelectedTab(index);
+        this.layout();
     }
 
     private KeyEvent paste() {
